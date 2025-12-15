@@ -20,14 +20,22 @@ export default function Layout() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="h-screen flex overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-900 text-white flex flex-col">
-        <div className="p-4 border-b border-gray-700">
-          <h1 className="text-xl font-bold">CopyBot</h1>
-          <p className="text-sm text-gray-400 mt-1">{host?.name}</p>
+      <aside className="w-64 bg-gray-900 text-white flex flex-col h-full">
+        <div className="p-4 border-b border-gray-700 flex justify-between items-center">
+          <div>
+            <h1 className="text-xl font-bold">CopyBot</h1>
+            <p className="text-sm text-gray-400">{host?.name}</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm"
+          >
+            Logout
+          </button>
         </div>
-        <nav className="flex-1 p-4">
+        <nav className="flex-1 p-4 overflow-y-auto">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
@@ -41,13 +49,7 @@ export default function Layout() {
           ))}
         </nav>
         <div className="p-4 border-t border-gray-700">
-          <p className="text-sm text-gray-400 mb-2">{user?.email}</p>
-          <button
-            onClick={handleLogout}
-            className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-sm"
-          >
-            Logout
-          </button>
+          <p className="text-sm text-gray-400 truncate">{user?.email}</p>
         </div>
       </aside>
 
