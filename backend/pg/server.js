@@ -82,7 +82,13 @@ function pushSignalToSubscribers(subscriberIds, trade, signalId) {
 
 // CORS
 app.use(cors({
-  origin: [FRONTEND_URL, 'http://localhost:3000', 'http://localhost:5173'],
+  origin: [
+    FRONTEND_URL,
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'https://copybot-dashboard.onrender.com',
+    /\.onrender\.com$/
+  ],
   credentials: true,
 }));
 
