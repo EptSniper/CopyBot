@@ -51,7 +51,7 @@ export default function Subscribers() {
     loadSubscribers()
   }
 
-  if (loading) return <div className="text-center py-8">Loading...</div>
+  if (loading) return <div className="text-center py-8 text-gray-400">Loading...</div>
 
   return (
     <div>
@@ -66,51 +66,51 @@ export default function Subscribers() {
       </div>
 
       {subscribers.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-500 mb-4">No subscribers yet</p>
-          <p className="text-sm text-gray-400">Add your first subscriber to start distributing signals</p>
+        <div className="bg-gray-800 rounded-lg p-8 text-center">
+          <p className="text-gray-400 mb-4">No subscribers yet</p>
+          <p className="text-sm text-gray-500">Add your first subscriber to start distributing signals</p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-gray-800 rounded-lg overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-900">
               <tr>
-                <th className="text-left px-4 py-3 text-sm font-medium">Name</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Email</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Status</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">API Key</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Deliveries</th>
-                <th className="text-left px-4 py-3 text-sm font-medium">Actions</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Name</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Email</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Status</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">API Key</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Deliveries</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Actions</th>
               </tr>
             </thead>
             <tbody>
               {subscribers.map((sub) => (
-                <tr key={sub.id} className="border-t">
+                <tr key={sub.id} className="border-t border-gray-700">
                   <td className="px-4 py-3 font-medium">{sub.name}</td>
-                  <td className="px-4 py-3 text-gray-600">{sub.email || '-'}</td>
+                  <td className="px-4 py-3 text-gray-400">{sub.email || '-'}</td>
                   <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded text-xs ${sub.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                    <span className={`px-2 py-1 rounded text-xs ${sub.status === 'active' ? 'bg-green-900 text-green-300' : 'bg-gray-700 text-gray-400'}`}>
                       {sub.status}
                     </span>
                   </td>
                   <td className="px-4 py-3">
                     <code 
-                      className="text-xs bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200"
+                      className="text-xs bg-gray-900 text-blue-400 px-2 py-1 rounded cursor-pointer hover:bg-gray-700"
                       onClick={() => { navigator.clipboard.writeText(sub.api_key); alert('API Key copied!'); }}
                       title="Click to copy full key"
                     >
                       {sub.api_key?.slice(0, 20)}... 📋
                     </code>
                   </td>
-                  <td className="px-4 py-3 text-sm">
+                  <td className="px-4 py-3 text-sm text-gray-400">
                     {sub.executed_deliveries || 0} / {sub.total_deliveries || 0}
                   </td>
                   <td className="px-4 py-3">
-                    <button onClick={() => handleEdit(sub)} className="text-blue-600 hover:underline text-sm mr-3">Edit</button>
-                    <button onClick={() => toggleStatus(sub)} className="text-yellow-600 hover:underline text-sm mr-3">
+                    <button onClick={() => handleEdit(sub)} className="text-blue-400 hover:text-blue-300 text-sm mr-3">Edit</button>
+                    <button onClick={() => toggleStatus(sub)} className="text-yellow-400 hover:text-yellow-300 text-sm mr-3">
                       {sub.status === 'active' ? 'Disable' : 'Enable'}
                     </button>
-                    <button onClick={() => handleDelete(sub.id)} className="text-red-600 hover:underline text-sm">Delete</button>
+                    <button onClick={() => handleDelete(sub.id)} className="text-red-400 hover:text-red-300 text-sm">Delete</button>
                   </td>
                 </tr>
               ))}
@@ -122,42 +122,42 @@ export default function Subscribers() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">{editingSub ? 'Edit Subscriber' : 'Add Subscriber'}</h2>
-            {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
+            {error && <div className="bg-red-900/50 text-red-200 p-3 rounded mb-4">{error}</div>}
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Name</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Name</label>
                 <input
                   type="text"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full px-3 py-2 border rounded"
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:ring-2 focus:ring-blue-500 outline-none"
                   required
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Email (optional)</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Email (optional)</label>
                 <input
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full px-3 py-2 border rounded"
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:ring-2 focus:ring-blue-500 outline-none"
                 />
               </div>
               <div className="mb-6">
-                <label className="block text-sm font-medium mb-1">Webhook URL (optional)</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Webhook URL (optional)</label>
                 <input
                   type="url"
                   value={form.webhook_url}
                   onChange={(e) => setForm({ ...form, webhook_url: e.target.value })}
                   placeholder="https://..."
-                  className="w-full px-3 py-2 border rounded"
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:ring-2 focus:ring-blue-500 outline-none"
                 />
                 <p className="text-xs text-gray-500 mt-1">Signals will be POSTed to this URL</p>
               </div>
               <div className="flex gap-3">
-                <button type="button" onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 border rounded">
+                <button type="button" onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 bg-gray-700 rounded hover:bg-gray-600">
                   Cancel
                 </button>
                 <button type="submit" className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
