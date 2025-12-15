@@ -20,6 +20,7 @@ import SubscriberLogin from './pages/subscriber/SubscriberLogin'
 import SubscriberDashboard from './pages/subscriber/SubscriberDashboard'
 import SubscriberSettings from './pages/subscriber/SubscriberSettings'
 import SubscriberTrades from './pages/subscriber/SubscriberTrades'
+import Landing from './pages/Landing'
 
 function ProtectedRoute({ children }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
@@ -46,6 +47,9 @@ export default function App() {
       <Route path="/subscriber/dashboard" element={<SubscriberDashboard />} />
       <Route path="/subscriber/settings" element={<SubscriberSettings />} />
       <Route path="/subscriber/trades" element={<SubscriberTrades />} />
+      
+      {/* Landing page */}
+      <Route path="/home" element={<Landing />} />
       
       {/* Public routes */}
       <Route path="/join/:code" element={<Join />} />

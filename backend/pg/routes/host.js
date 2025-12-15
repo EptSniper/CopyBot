@@ -264,7 +264,7 @@ router.get('/signals', async (req, res) => {
     const offset = parseInt(req.query.offset) || 0;
     
     const signals = await all(
-      `SELECT s.*, 
+      `SELECT s.id, s.host_id, s.payload, s.result, s.exit_price, s.pnl, s.closed_at, s.created_at,
         (SELECT COUNT(*) FROM deliveries WHERE signal_id = s.id) as delivery_count,
         (SELECT COUNT(*) FROM deliveries WHERE signal_id = s.id AND status = 'executed') as executed_count
       FROM signals s
@@ -407,18 +407,29 @@ router.patch('/signals/:signalId/result', async (req, res) => {
     const signal = await one('SELECT * FROM signals WHERE id = $1 AND host_id = $2', [signalId, host.id]);
     if (!signal) return res.status(404).json({ error: 'signal not found' });
 
-    const { result, exit_price, pnl, pnl_percent, notes } = req.body;
+    const { result, exit_price, pnl, notes } = req.body;
 
+    // Update signal table
+    await query(`
+      UPDATE signals SET 
+        result = COALESCE($1, result),
+        exit_price = COALESCE($2, exit_price),
+        pnl = COALESCE($3, pnl),
+        notes = COALESCE($4, notes),
+        closed_at = CASE WHEN $1 IS NOT NULL THEN NOW() ELSE closed_at END
+      WHERE id = $5`,
+      [result, exit_price, pnl, notes, signalId]
+    );
+
+    // Also update deliveries for this signal
     await query(`
       UPDATE deliveries SET 
         result = COALESCE($1, result),
         exit_price = COALESCE($2, exit_price),
         pnl = COALESCE($3, pnl),
-        pnl_percent = COALESCE($4, pnl_percent),
-        notes = COALESCE($5, notes),
         closed_at = CASE WHEN $1 IS NOT NULL THEN NOW() ELSE closed_at END
-      WHERE signal_id = $6
-    `, [result, exit_price, pnl, pnl_percent, notes, signalId]);
+      WHERE signal_id = $4
+    `, [result, exit_price, pnl, signalId]);
 
     res.json({ ok: true });
   } catch (err) {
