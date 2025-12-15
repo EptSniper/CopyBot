@@ -1,7 +1,13 @@
 const express = require('express');
 const crypto = require('crypto');
-const { query, one } = require('../db');
+const { query } = require('../db');
 const { verifyAccessToken } = require('../lib/auth');
+
+// Helper function
+async function one(text, params) {
+  const res = await query(text, params);
+  return res.rows[0] || null;
+}
 
 const router = express.Router();
 
@@ -39,11 +45,11 @@ async function jwtAuth(req, res, next) {
 // Get all invite codes for host
 router.get('/', jwtAuth, async (req, res) => {
   try {
-    const codes = await query(
+    const result = await query(
       'SELECT * FROM invite_codes WHERE host_id = $1 ORDER BY created_at DESC',
       [req.hostAccount.id]
     );
-    res.json({ codes });
+    res.json({ codes: result.rows });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
