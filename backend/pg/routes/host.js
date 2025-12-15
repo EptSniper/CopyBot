@@ -278,6 +278,110 @@ router.get('/stats', async (req, res) => {
   }
 });
 
+// Get trade analytics
+router.get('/analytics', async (req, res) => {
+  try {
+    const host = await one('SELECT * FROM hosts WHERE user_id = $1', [req.user.userId]);
+    if (!host) return res.status(404).json({ error: 'host not found' });
+
+    const days = parseInt(req.query.days) || 30;
+
+    // Overall stats
+    const overall = await one(`
+      SELECT
+        COUNT(*) as total_trades,
+        COUNT(*) FILTER (WHERE d.result = 'win') as wins,
+        COUNT(*) FILTER (WHERE d.result = 'loss') as losses,
+        COUNT(*) FILTER (WHERE d.result = 'breakeven') as breakeven,
+        COUNT(*) FILTER (WHERE d.result IS NULL OR d.result = 'pending') as pending,
+        COALESCE(SUM(d.pnl), 0) as total_pnl,
+        COALESCE(AVG(d.pnl) FILTER (WHERE d.result IS NOT NULL), 0) as avg_pnl,
+        COALESCE(AVG(d.pnl_percent) FILTER (WHERE d.result IS NOT NULL), 0) as avg_pnl_percent
+      FROM deliveries d
+      JOIN signals s ON s.id = d.signal_id
+      WHERE s.host_id = $1 AND s.created_at > NOW() - INTERVAL '1 day' * $2
+    `, [host.id, days]);
+
+    // Daily breakdown
+    const daily = await all(`
+      SELECT 
+        DATE(s.created_at) as date,
+        COUNT(*) as trades,
+        COUNT(*) FILTER (WHERE d.result = 'win') as wins,
+        COUNT(*) FILTER (WHERE d.result = 'loss') as losses,
+        COALESCE(SUM(d.pnl), 0) as pnl
+      FROM deliveries d
+      JOIN signals s ON s.id = d.signal_id
+      WHERE s.host_id = $1 AND s.created_at > NOW() - INTERVAL '1 day' * $2
+      GROUP BY DATE(s.created_at)
+      ORDER BY date DESC
+    `, [host.id, days]);
+
+    // By symbol
+    const bySymbol = await all(`
+      SELECT 
+        s.payload->>'symbol' as symbol,
+        COUNT(*) as trades,
+        COUNT(*) FILTER (WHERE d.result = 'win') as wins,
+        COUNT(*) FILTER (WHERE d.result = 'loss') as losses,
+        COALESCE(SUM(d.pnl), 0) as pnl
+      FROM deliveries d
+      JOIN signals s ON s.id = d.signal_id
+      WHERE s.host_id = $1 AND s.created_at > NOW() - INTERVAL '1 day' * $2
+      GROUP BY s.payload->>'symbol'
+      ORDER BY trades DESC
+      LIMIT 10
+    `, [host.id, days]);
+
+    // Win rate calculation
+    const closedTrades = (parseInt(overall.wins) || 0) + (parseInt(overall.losses) || 0);
+    const winRate = closedTrades > 0 ? ((parseInt(overall.wins) || 0) / closedTrades * 100).toFixed(1) : 0;
+
+    res.json({
+      period: `${days} days`,
+      overall: {
+        ...overall,
+        win_rate: winRate
+      },
+      daily,
+      bySymbol
+    });
+  } catch (err) {
+    console.error('Analytics error:', err);
+    res.status(500).json({ error: 'failed to get analytics' });
+  }
+});
+
+// Update trade result (for manual tracking)
+router.patch('/signals/:signalId/result', async (req, res) => {
+  try {
+    const host = await one('SELECT * FROM hosts WHERE user_id = $1', [req.user.userId]);
+    if (!host) return res.status(404).json({ error: 'host not found' });
+
+    const signalId = parseInt(req.params.signalId);
+    const signal = await one('SELECT * FROM signals WHERE id = $1 AND host_id = $2', [signalId, host.id]);
+    if (!signal) return res.status(404).json({ error: 'signal not found' });
+
+    const { result, exit_price, pnl, pnl_percent, notes } = req.body;
+
+    await query(`
+      UPDATE deliveries SET 
+        result = COALESCE($1, result),
+        exit_price = COALESCE($2, exit_price),
+        pnl = COALESCE($3, pnl),
+        pnl_percent = COALESCE($4, pnl_percent),
+        notes = COALESCE($5, notes),
+        closed_at = CASE WHEN $1 IS NOT NULL THEN NOW() ELSE closed_at END
+      WHERE signal_id = $6
+    `, [result, exit_price, pnl, pnl_percent, notes, signalId]);
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Update result error:', err);
+    res.status(500).json({ error: 'update failed' });
+  }
+});
+
 // Helpers
 async function one(text, params) {
   const res = await query(text, params);
