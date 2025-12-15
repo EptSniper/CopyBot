@@ -8,6 +8,8 @@ import Subscribers from './pages/Subscribers'
 import Signals from './pages/Signals'
 import Settings from './pages/Settings'
 import Billing from './pages/Billing'
+import Join from './pages/Join'
+import Invites from './pages/Invites'
 
 function ProtectedRoute({ children }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
@@ -24,6 +26,7 @@ function PublicRoute({ children }) {
 export default function App() {
   return (
     <Routes>
+      <Route path="/join/:code" element={<Join />} />
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
@@ -33,6 +36,7 @@ export default function App() {
         <Route path="signals" element={<Signals />} />
         <Route path="settings" element={<Settings />} />
         <Route path="billing" element={<Billing />} />
+        <Route path="invites" element={<Invites />} />
       </Route>
     </Routes>
   )
