@@ -12,6 +12,7 @@ const hostRoutes = require('./routes/host');
 const billingRoutes = require('./routes/billing');
 const adminRoutes = require('./routes/admin');
 const inviteRoutes = require('./routes/invite');
+const activateRoutes = require('./routes/activate');
 
 const PORT = process.env.BACKEND_PORT || 4000;
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
@@ -110,6 +111,7 @@ app.get('/health', (_req, res) => {
 // ============ PUBLIC ROUTES ============
 app.use('/auth', authRoutes);
 app.use('/invite', inviteRoutes);
+app.use('/activate', activateRoutes);
 
 // Billing plans (public)
 app.get('/billing/plans', async (req, res) => {

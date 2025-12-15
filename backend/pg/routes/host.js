@@ -1,7 +1,7 @@
 const express = require('express');
 const { query } = require('../db');
 const { randomBytes } = require('crypto');
-const stripe = require('../lib/stripe');
+const { validateApiKey } = require('../lib/whop');
 
 const router = express.Router();
 
@@ -51,6 +51,51 @@ router.patch('/me', async (req, res) => {
     res.json({ id: host.id, name: newName, settings: newSettings });
   } catch (err) {
     console.error('Update host error:', err);
+    res.status(500).json({ error: 'update failed' });
+  }
+});
+
+// Update Whop integration settings
+router.patch('/whop-settings', async (req, res) => {
+  try {
+    const { whop_api_key, whop_product_id } = req.body;
+    const host = await one('SELECT * FROM hosts WHERE user_id = $1', [req.user.userId]);
+    
+    if (!host) {
+      return res.status(404).json({ error: 'host not found' });
+    }
+
+    // Validate API key if provided
+    if (whop_api_key) {
+      const validation = await validateApiKey(whop_api_key);
+      if (!validation.valid) {
+        return res.status(400).json({ error: validation.error });
+      }
+    }
+
+    // Generate slug if not exists
+    let slug = host.slug;
+    if (!slug) {
+      slug = host.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      // Ensure unique
+      const existing = await one('SELECT id FROM hosts WHERE slug = $1 AND id != $2', [slug, host.id]);
+      if (existing) {
+        slug = `${slug}-${randomBytes(3).toString('hex')}`;
+      }
+    }
+
+    await query(
+      'UPDATE hosts SET whop_api_key = $1, whop_product_id = $2, slug = $3 WHERE id = $4',
+      [whop_api_key || host.whop_api_key, whop_product_id || host.whop_product_id, slug, host.id]
+    );
+
+    res.json({ 
+      ok: true, 
+      slug,
+      activation_url: `/activate/${slug}`
+    });
+  } catch (err) {
+    console.error('Update Whop settings error:', err);
     res.status(500).json({ error: 'update failed' });
   }
 });

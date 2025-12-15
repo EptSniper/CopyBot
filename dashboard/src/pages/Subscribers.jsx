@@ -77,6 +77,7 @@ export default function Subscribers() {
               <tr>
                 <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Name</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Email</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Source</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Status</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">API Key</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Deliveries</th>
@@ -88,6 +89,15 @@ export default function Subscribers() {
                 <tr key={sub.id} className="border-t border-gray-700">
                   <td className="px-4 py-3 font-medium">{sub.name}</td>
                   <td className="px-4 py-3 text-gray-400">{sub.email || '-'}</td>
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      sub.activated_via === 'whop' ? 'bg-purple-900 text-purple-300' :
+                      sub.activated_via === 'invite' ? 'bg-blue-900 text-blue-300' :
+                      'bg-gray-700 text-gray-400'
+                    }`}>
+                      {sub.activated_via || 'manual'}
+                    </span>
+                  </td>
                   <td className="px-4 py-3">
                     <span className={`px-2 py-1 rounded text-xs ${sub.status === 'active' ? 'bg-green-900 text-green-300' : 'bg-gray-700 text-gray-400'}`}>
                       {sub.status}
