@@ -1,0 +1,40 @@
+{
+  "name": "copybot",
+  "version": "1.0.0",
+  "description": "Multi-tenant trade signal platform",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "bot:start": "node index.js",
+    "backend:start": "node backend/server.js",
+    "backend:seed": "node backend/seed.js",
+    "backend:pg:start": "node backend/pg/server.js",
+    "backend:pg:migrate": "node backend/pg/migrate.js",
+    "backend:pg:seed": "node backend/pg/seed.js",
+    "dashboard:dev": "cd dashboard && npm run dev",
+    "dashboard:build": "cd dashboard && npm run build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "keywords": [
+    "trading",
+    "signals",
+    "discord",
+    "saas"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "discord.js": "^14.25.1",
+    "dotenv": "^17.2.3",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.12.0",
+    "sql.js": "^1.13.0",
+    "stripe": "^14.10.0",
+    "ws": "^8.18.3"
+  }
+}
