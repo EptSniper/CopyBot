@@ -10,6 +10,9 @@ import Settings from './pages/Settings'
 import Billing from './pages/Billing'
 import Join from './pages/Join'
 import Invites from './pages/Invites'
+import AdminLogin from './pages/admin/AdminLogin'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminHostDetail from './pages/admin/AdminHostDetail'
 
 function ProtectedRoute({ children }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
@@ -26,6 +29,12 @@ function PublicRoute({ children }) {
 export default function App() {
   return (
     <Routes>
+      {/* Admin routes */}
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/admin/hosts/:id" element={<AdminHostDetail />} />
+      
+      {/* Public routes */}
       <Route path="/join/:code" element={<Join />} />
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
