@@ -7,11 +7,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
+using System.Windows.Media;
 using NinjaTrader.Cbi;
 using NinjaTrader.Gui;
 using NinjaTrader.Gui.Chart;
+using NinjaTrader.Gui.Tools;
 using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
+using NinjaTrader.NinjaScript.DrawingTools;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 #endregion
@@ -94,23 +97,17 @@ namespace NinjaTrader.NinjaScript.Indicators
 
         protected override void OnBarUpdate()
         {
-            // Display status on chart
+            // Draw status on chart using NinjaScript Draw methods
+            var text = $"CopyBot: {statusMessage}\nSignals: {signalsReceived} | Trades: {tradesExecuted}";
+            
+            Draw.TextFixed(this, "CopyBotStatus", text, TextPosition.TopRight,
+                isConnected ? Brushes.LimeGreen : Brushes.Red,
+                new SimpleFont("Arial", 10), Brushes.Transparent, Brushes.Transparent, 0);
         }
 
         protected override void OnRender(ChartControl chartControl, ChartScale chartScale)
         {
             base.OnRender(chartControl, chartScale);
-            
-            // Draw status panel
-            using (var brush = new System.Windows.Media.SolidColorBrush(isConnected ? 
-                System.Windows.Media.Colors.Green : System.Windows.Media.Colors.Red))
-            {
-                var text = $"CopyBot: {statusMessage}\nSignals: {signalsReceived} | Trades: {tradesExecuted}";
-                
-                Draw.TextFixed(this, "CopyBotStatus", text, TextPosition.TopRight,
-                    isConnected ? Brushes.LimeGreen : Brushes.Red,
-                    new Gui.Tools.SimpleFont("Arial", 10), Brushes.Transparent, Brushes.Transparent, 0);
-            }
         }
 
         private async void StartConnection()
