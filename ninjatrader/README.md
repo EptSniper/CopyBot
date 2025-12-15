@@ -1,84 +1,108 @@
-# CopyBot NinjaTrader Signal Executor
+# CopyBot NinjaTrader Integration
 
-Automatically executes trade signals from CopyBot in NinjaTrader 8.
+## Quick Start (Easiest Method)
 
-## Installation
+### Option 1: All-in-One NinjaTrader Indicator (Recommended)
 
-1. Open NinjaTrader 8
-2. Go to **Tools → Edit NinjaScript → Strategy**
-3. Right-click in the left panel → **New → Strategy**
-4. Name it `CopyBotSignalExecutor`
-5. Replace all the code with the contents of `CopyBotSignalExecutor.cs`
-6. Press **F5** to compile (or click the compile button)
+1. Copy `CopyBotIndicator.cs` to your NinjaTrader indicators folder:
+   ```
+   Documents\NinjaTrader 8\bin\Custom\Indicators\
+   ```
 
-## Configuration
+2. In NinjaTrader, go to **Tools → Edit NinjaScript → Indicators**
 
-1. Open a chart for the instrument you want to trade (e.g., ES, NQ)
-2. Right-click on the chart → **Strategies**
-3. Find `CopyBotSignalExecutor` and add it
-4. Configure the settings:
+3. Right-click and select **Compile**
 
-| Setting | Description |
-|---------|-------------|
-| **API URL** | Your CopyBot backend URL (e.g., `https://your-api.com` or `http://localhost:4000` for testing) |
-| **API Key** | Your subscriber API key (get this from the host who added you) |
-| **Poll Interval** | How often to check for signals (default: 5 seconds) |
-| **Default Quantity** | Contracts to trade if signal doesn't specify |
-| **Enable Trading** | Set to `True` to actually place trades. Keep `False` for testing. |
+4. Add the indicator to any chart:
+   - Right-click chart → **Indicators** → **CopyBot**
+   - Enter your API key (starts with `sub_`)
+   - Click OK
 
-5. Click **OK** to start the strategy
+5. Done! The indicator connects directly to CopyBot and executes trades automatically.
 
-## How It Works
+---
 
-1. The strategy polls your CopyBot API every few seconds
-2. When a new signal arrives, it:
-   - Acknowledges receipt
-   - Places the order (market or limit)
-   - Sets stop loss and take profit
-   - Reports execution status back to the API
+### Option 2: Windows Setup Script
 
-## Testing
+1. Open PowerShell as Administrator
 
-1. Start with **Enable Trading = False**
-2. Watch the NinjaTrader Output window for signal logs
-3. Once you see signals coming through correctly, enable trading
+2. Navigate to this folder:
+   ```powershell
+   cd path\to\ninjatrader
+   ```
 
-## Supported Order Types
+3. Run the setup script:
+   ```powershell
+   .\CopyBotSetup.ps1
+   ```
 
-- **MARKET** - Immediate execution at market price
-- **LIMIT** - Limit order at specified entry price
+4. Enter your API key when prompted
 
-## Signal Format Expected
+5. The script will:
+   - Configure CopyBot with your API key
+   - Create a startup shortcut (runs automatically on Windows boot)
+   - Start receiving signals
 
-```json
-{
-  "symbol": "ES",
-  "side": "BUY",
-  "orderType": "MARKET",
-  "entryPrice": null,
-  "stopLoss": 5950.00,
-  "quantity": 1,
-  "takeProfits": [{ "price": 6000.00 }]
-}
-```
+---
+
+### Option 3: Manual Setup
+
+1. Install Node.js from https://nodejs.org/
+
+2. Run the client:
+   ```powershell
+   node copybot-client.js YOUR_API_KEY wss://copybot-api.onrender.com/ws
+   ```
+
+3. Import these files into NinjaTrader:
+   - `CopyBotFileReader.cs` - Reads signals from file
+   - `CopyBotSignalExecutor.cs` - Executes trades
+
+---
+
+## Getting Your API Key
+
+1. Go to https://copybot-dashboard.onrender.com/subscriber/login
+2. Enter your API key to access the portal
+3. Or get a new key via:
+   - Whop activation link from your signal provider
+   - Invite link from your signal provider
+   - Direct from your signal provider
+
+---
+
+## Files
+
+| File | Description |
+|------|-------------|
+| `CopyBotIndicator.cs` | All-in-one NinjaTrader indicator (recommended) |
+| `CopyBotSetup.ps1` | Windows setup script |
+| `copybot-client.js` | Node.js WebSocket client |
+| `CopyBotFileReader.cs` | NinjaTrader file reader indicator |
+| `CopyBotSignalExecutor.cs` | NinjaTrader trade executor |
+
+---
 
 ## Troubleshooting
 
-**"API Key not configured"**
-- Make sure you entered your subscriber API key in the strategy settings
+**"API key required"**
+- Make sure you entered your subscriber API key (starts with `sub_`)
 
-**"Symbol mismatch"**
-- The signal is for a different instrument than your chart
-- Open a chart for the correct symbol
+**"Connection failed"**
+- Check your internet connection
+- Verify the server URL is correct: `wss://copybot-api.onrender.com/ws`
 
-**No signals appearing**
-- Check that the API URL is correct
-- Verify your API key is valid
-- Make sure the host has sent signals
+**"Instrument not found"**
+- Make sure the symbol exists in NinjaTrader
+- Check that you have market data for that instrument
 
-## Important Notes
+**Signals not executing**
+- Verify "Auto Execute" is enabled
+- Check that you have a valid trading account connected
+- Look at NinjaTrader's output window for error messages
 
-- Run on a chart matching the symbols you'll receive signals for
-- Start with paper trading / simulation mode
-- The strategy must be running for signals to execute
-- One strategy instance per symbol you want to trade
+---
+
+## Support
+
+Contact your signal provider for API key issues.
