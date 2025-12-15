@@ -16,6 +16,10 @@ import AdminHostDetail from './pages/admin/AdminHostDetail'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import Activate from './pages/Activate'
+import SubscriberLogin from './pages/subscriber/SubscriberLogin'
+import SubscriberDashboard from './pages/subscriber/SubscriberDashboard'
+import SubscriberSettings from './pages/subscriber/SubscriberSettings'
+import SubscriberTrades from './pages/subscriber/SubscriberTrades'
 
 function ProtectedRoute({ children }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
@@ -36,6 +40,12 @@ export default function App() {
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/hosts/:id" element={<AdminHostDetail />} />
+      
+      {/* Subscriber portal routes */}
+      <Route path="/subscriber/login" element={<SubscriberLogin />} />
+      <Route path="/subscriber/dashboard" element={<SubscriberDashboard />} />
+      <Route path="/subscriber/settings" element={<SubscriberSettings />} />
+      <Route path="/subscriber/trades" element={<SubscriberTrades />} />
       
       {/* Public routes */}
       <Route path="/join/:code" element={<Join />} />

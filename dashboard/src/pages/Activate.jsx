@@ -88,7 +88,7 @@ export default function Activate() {
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 mb-6">
             <h3 className="font-semibold text-white">Next Steps:</h3>
             {Object.entries(result.instructions).map(([key, value]) => (
               <div key={key} className="flex gap-3 text-gray-300">
@@ -96,6 +96,18 @@ export default function Activate() {
                 <span>{value}</span>
               </div>
             ))}
+          </div>
+
+          <div className="border-t border-gray-700 pt-4">
+            <Link
+              to="/subscriber/login"
+              className="block w-full text-center bg-gray-700 text-white py-3 rounded hover:bg-gray-600"
+            >
+              Go to Subscriber Portal →
+            </Link>
+            <p className="text-xs text-gray-500 text-center mt-2">
+              Configure trading preferences, view history, and more
+            </p>
           </div>
         </div>
       </div>
