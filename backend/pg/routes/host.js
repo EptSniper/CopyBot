@@ -3,6 +3,7 @@ const { query } = require('../db');
 const { randomBytes } = require('crypto');
 const { validateApiKey } = require('../lib/whop');
 const { testWebhook, getWebhookLogs } = require('../lib/webhook');
+const { getPendingSignals, getFailedDeliveries, retryFailedDeliveries, getDeliveryStats } = require('../lib/signalBackup');
 
 const router = express.Router();
 
@@ -471,6 +472,71 @@ router.patch('/signals/:signalId/result', async (req, res) => {
   } catch (err) {
     console.error('Update result error:', err);
     res.status(500).json({ error: 'update failed' });
+  }
+});
+
+// Get pending/failed signals for recovery
+router.get('/signals/pending', async (req, res) => {
+  try {
+    const host = await one('SELECT * FROM hosts WHERE user_id = $1', [req.user.userId]);
+    if (!host) return res.status(404).json({ error: 'host not found' });
+
+    const pending = await getPendingSignals(host.id);
+    res.json(pending);
+  } catch (err) {
+    console.error('Get pending signals error:', err);
+    res.status(500).json({ error: 'failed to get pending signals' });
+  }
+});
+
+// Get failed deliveries for a signal
+router.get('/signals/:signalId/failed', async (req, res) => {
+  try {
+    const host = await one('SELECT * FROM hosts WHERE user_id = $1', [req.user.userId]);
+    if (!host) return res.status(404).json({ error: 'host not found' });
+
+    const signalId = parseInt(req.params.signalId);
+    const signal = await one('SELECT * FROM signals WHERE id = $1 AND host_id = $2', [signalId, host.id]);
+    if (!signal) return res.status(404).json({ error: 'signal not found' });
+
+    const failed = await getFailedDeliveries(signalId);
+    res.json(failed);
+  } catch (err) {
+    console.error('Get failed deliveries error:', err);
+    res.status(500).json({ error: 'failed to get failed deliveries' });
+  }
+});
+
+// Retry failed deliveries for a signal
+router.post('/signals/:signalId/retry', async (req, res) => {
+  try {
+    const host = await one('SELECT * FROM hosts WHERE user_id = $1', [req.user.userId]);
+    if (!host) return res.status(404).json({ error: 'host not found' });
+
+    const signalId = parseInt(req.params.signalId);
+    const signal = await one('SELECT * FROM signals WHERE id = $1 AND host_id = $2', [signalId, host.id]);
+    if (!signal) return res.status(404).json({ error: 'signal not found' });
+
+    const result = await retryFailedDeliveries(signalId);
+    res.json(result);
+  } catch (err) {
+    console.error('Retry deliveries error:', err);
+    res.status(500).json({ error: 'retry failed' });
+  }
+});
+
+// Get delivery stats
+router.get('/delivery-stats', async (req, res) => {
+  try {
+    const host = await one('SELECT * FROM hosts WHERE user_id = $1', [req.user.userId]);
+    if (!host) return res.status(404).json({ error: 'host not found' });
+
+    const days = parseInt(req.query.days) || 7;
+    const stats = await getDeliveryStats(host.id, days);
+    res.json(stats || {});
+  } catch (err) {
+    console.error('Get delivery stats error:', err);
+    res.status(500).json({ error: 'failed to get stats' });
   }
 });
 
