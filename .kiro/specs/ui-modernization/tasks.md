@@ -1,0 +1,141 @@
+# Implementation Plan
+
+- [ ] 1. Set up design system foundation
+  - [ ] 1.1 Extend Tailwind configuration with custom color palette
+    - Add primary colors (blue-purple gradient base)
+    - Add surface colors (refined grays with blue undertones)
+    - Add semantic colors for success, danger, warning states
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
+  - [ ] 1.2 Add custom CSS properties and base styles to index.css
+    - Define gradient CSS custom properties
+    - Add Inter font import
+    - Add reduced-motion media query support
+    - Define base body and scrollbar styles
+    - _Requirements: 2.1, 8.1, 8.2_
+  - [ ] 1.3 Add custom animations to Tailwind config
+    - Add fade-in animation
+    - Add subtle scale animations for hover states
+    - _Requirements: 8.1, 8.2, 8.3_
+
+- [ ] 2. Create reusable UI components
+  - [ ] 2.1 Create Card component with glassmorphism styling
+    - Implement base card with backdrop blur and border
+    - Add hover state with glow effect
+    - Export from components directory
+    - _Requirements: 3.1, 3.2, 3.4_
+  - [ ] 2.2 Create Button component with variants
+    - Implement primary variant with gradient background
+    - Implement secondary variant with outlined styling
+    - Add loading state with spinner indicator
+    - _Requirements: 5.3, 5.4, 5.5_
+  - [ ] 2.3 Create Input component with focus styling
+    - Implement base input with consistent styling
+    - Add focus ring with gradient glow effect
+    - _Requirements: 5.1, 5.2_
+  - [ ] 2.4 Create Badge component for status indicators
+    - Implement success, danger, warning, and neutral variants
+    - Ensure consistent styling across variants
+    - _Requirements: 7.1, 7.4_
+  - [ ] 2.5 Create StatCard component with gradient accents
+    - Implement stat display with gradient text
+    - Add accent border styling
+    - Support color variants for positive/negative values
+    - _Requirements: 3.3, 7.2_
+  - [ ]* 2.6 Write property test for P&L color coding
+    - **Property 1: P&L Color Coding Consistency**
+    - **Validates: Requirements 7.2**
+
+- [ ] 3. Update Layout and Navigation
+  - [ ] 3.1 Modernize sidebar navigation styling
+    - Update background and border styling
+    - Add gradient active state indicator
+    - Implement smooth hover transitions
+    - Update logo/branding area
+    - _Requirements: 4.1, 4.2, 4.3, 4.4_
+  - [ ] 3.2 Update mobile navigation styling
+    - Apply consistent styling to mobile menu
+    - Update overlay and transition effects
+    - _Requirements: 4.1, 4.3_
+
+- [ ] 4. Update Landing Page
+  - [ ] 4.1 Modernize hero section
+    - Add gradient background with animated elements
+    - Update typography with gradient text effects
+    - Style CTA buttons with gradient and glow
+    - _Requirements: 6.1, 6.3_
+  - [ ] 4.2 Update feature cards section
+    - Apply new Card component styling
+    - Add gradient icon accents
+    - Implement hover effects
+    - _Requirements: 6.2_
+  - [ ] 4.3 Update remaining landing page sections
+    - Apply consistent card and typography styling
+    - Update footer with refined styling
+    - Add smooth scroll behavior
+    - _Requirements: 6.4_
+
+- [ ] 5. Update Authentication Pages
+  - [ ] 5.1 Modernize Login page
+    - Apply new Card, Input, and Button components
+    - Add subtle background gradient
+    - _Requirements: 3.1, 5.1, 5.2, 5.3_
+  - [ ] 5.2 Update Register, ForgotPassword, and ResetPassword pages
+    - Apply consistent styling from Login page
+    - _Requirements: 3.1, 5.1, 5.2, 5.3_
+  - [ ] 5.3 Update subscriber authentication pages
+    - Apply styling to SubscriberLogin
+    - Ensure visual consistency with host auth pages
+    - _Requirements: 3.1, 5.1, 5.2, 5.3_
+
+- [ ] 6. Update Dashboard Pages
+  - [ ] 6.1 Modernize main Dashboard page
+    - Apply StatCard component for metrics
+    - Update table styling with hover states
+    - Apply Badge component for status indicators
+    - _Requirements: 3.3, 7.1, 7.2, 7.3_
+  - [ ] 6.2 Update Signals page
+    - Apply new table styling
+    - Update modal with Card styling
+    - Apply Badge component for result indicators
+    - _Requirements: 7.1, 7.3, 7.4, 8.3_
+  - [ ] 6.3 Update Subscribers page
+    - Apply consistent table and card styling
+    - Update status badges
+    - _Requirements: 7.3, 7.4_
+  - [ ] 6.4 Update Settings and Billing pages
+    - Apply Card component for sections
+    - Update form inputs with new styling
+    - _Requirements: 3.1, 5.1, 5.2_
+  - [ ] 6.5 Update Invites page
+    - Apply consistent card and table styling
+    - _Requirements: 3.1, 7.3_
+
+- [ ] 7. Update Subscriber Portal Pages
+  - [ ] 7.1 Modernize SubscriberDashboard
+    - Apply StatCard and Card components
+    - Update metrics display
+    - _Requirements: 3.3, 7.1, 7.2_
+  - [ ] 7.2 Update SubscriberTrades page
+    - Apply table styling and badges
+    - _Requirements: 7.1, 7.3, 7.4_
+  - [ ] 7.3 Update SubscriberSettings page
+    - Apply Card and Input component styling
+    - _Requirements: 3.1, 5.1, 5.2_
+
+- [ ] 8. Update Admin Pages
+  - [ ] 8.1 Modernize AdminDashboard and AdminLogin
+    - Apply consistent styling with main dashboard
+    - _Requirements: 3.1, 5.1, 7.3_
+  - [ ] 8.2 Update AdminHostDetail page
+    - Apply Card and table styling
+    - _Requirements: 3.1, 7.3_
+
+- [ ] 9. Final polish and consistency check
+  - [ ] 9.1 Review and fix any styling inconsistencies
+    - Verify all pages use new components
+    - Check responsive behavior
+    - Verify reduced-motion support
+    - _Requirements: 2.2, 2.3, 8.4_
+
+- [ ] 10. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.

@@ -71,7 +71,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 BarsRequiredToTrade = 0;
 
                 // Default settings
-                ApiUrl = "http://localhost:4000";
+                ApiUrl = "https://copybot-api.onrender.com";
                 ApiKey = "";
                 PollIntervalSeconds = 1;
                 DefaultQuantity = 1;
