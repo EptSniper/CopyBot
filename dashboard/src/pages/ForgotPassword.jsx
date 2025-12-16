@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Card, CardContent, Button, Input } from '../components/ui'
 
 const API_BASE = import.meta.env.VITE_API_URL || ''
 
@@ -32,57 +33,68 @@ export default function ForgotPassword() {
 
   if (sent) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        <div className="bg-gray-800 p-8 rounded-lg max-w-md w-full text-center">
-          <div className="text-green-400 text-5xl mb-4">✓</div>
-          <h1 className="text-2xl font-bold text-white mb-2">Check Your Email</h1>
-          <p className="text-gray-400 mb-6">
-            If an account exists with that email, we've sent password reset instructions.
-          </p>
-          <Link to="/login" className="text-blue-400 hover:text-blue-300">
-            Back to Login
-          </Link>
+      <div className="min-h-screen bg-surface-950 flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
         </div>
+        <Card className="max-w-md w-full relative z-10 animate-fade-in" hover={false}>
+          <CardContent className="p-8 text-center">
+            <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-6">
+              <span className="text-emerald-400 text-3xl">✓</span>
+            </div>
+            <h1 className="text-2xl font-bold text-white mb-2">Check Your Email</h1>
+            <p className="text-surface-400 mb-6">
+              If an account exists with that email, we've sent password reset instructions.
+            </p>
+            <Link to="/login" className="text-primary-400 hover:text-primary-300 transition-colors">
+              Back to Login
+            </Link>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="bg-gray-800 p-8 rounded-lg max-w-md w-full">
-        <h1 className="text-2xl font-bold text-white mb-2">Forgot Password</h1>
-        <p className="text-gray-400 mb-6">Enter your email to receive reset instructions.</p>
+    <div className="min-h-screen bg-surface-950 flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+      </div>
+      
+      <Card className="max-w-md w-full relative z-10 animate-fade-in" hover={false}>
+        <CardContent className="p-8">
+          <h1 className="text-2xl font-bold text-white mb-2">Forgot Password</h1>
+          <p className="text-surface-400 mb-6">Enter your email to receive reset instructions.</p>
 
-        {error && (
-          <div className="bg-red-900/50 text-red-200 p-3 rounded mb-4">{error}</div>
-        )}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg mb-6 text-sm">
+              {error}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-gray-300 mb-1">Email</label>
-            <input
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <Input
+              label="Email"
               type="email"
               required
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="w-full bg-gray-700 text-white p-3 rounded focus:ring-2 focus:ring-blue-500 outline-none"
               placeholder="you@example.com"
             />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white py-3 rounded font-semibold"
-          >
-            {loading ? 'Sending...' : 'Send Reset Link'}
-          </button>
-        </form>
+            <Button type="submit" loading={loading} className="w-full">
+              Send Reset Link
+            </Button>
+          </form>
 
-        <p className="text-gray-400 text-center mt-6">
-          Remember your password?{' '}
-          <Link to="/login" className="text-blue-400 hover:text-blue-300">Login</Link>
-        </p>
-      </div>
+          <p className="text-surface-400 text-center mt-6 text-sm">
+            Remember your password?{' '}
+            <Link to="/login" className="text-primary-400 hover:text-primary-300 transition-colors">
+              Login
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
     </div>
   )
 }

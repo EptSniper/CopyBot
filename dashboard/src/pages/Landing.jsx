@@ -1,119 +1,150 @@
 import { Link } from 'react-router-dom'
+import { Button } from '../components/ui'
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-surface-950">
       {/* Header */}
-      <header className="border-b border-gray-800">
+      <header className="border-b border-surface-800/50 backdrop-blur-md bg-surface-950/80 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🤖</span>
-            <span className="text-xl font-bold text-white">CopyBot</span>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-purple-500 flex items-center justify-center text-xl shadow-lg shadow-primary-500/20">
+              🤖
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-white to-surface-300 bg-clip-text text-transparent">
+              CopyBot
+            </span>
           </div>
           <div className="flex items-center gap-4">
-            <Link to="/subscriber/login" className="text-gray-400 hover:text-white">
+            <Link to="/subscriber/login" className="text-surface-400 hover:text-white transition-colors hidden sm:block">
               Subscriber Login
             </Link>
-            <Link to="/login" className="text-gray-400 hover:text-white">
+            <Link to="/login" className="text-surface-400 hover:text-white transition-colors">
               Host Login
             </Link>
-            <Link to="/register" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-              Get Started
+            <Link to="/register">
+              <Button size="sm">Get Started</Button>
             </Link>
           </div>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl font-bold text-white mb-6">
-            Copy Trade Signals to <span className="text-blue-500">NinjaTrader</span> Instantly
+      <section className="relative py-24 px-4 overflow-hidden">
+        {/* Background gradient effects */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/20 rounded-full blur-3xl animate-pulse-glow" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1s' }} />
+        </div>
+        
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-800/50 border border-surface-700/50 text-sm text-surface-300 mb-8 backdrop-blur-sm">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            Real-time signal delivery
+          </div>
+          
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+            Copy Trade Signals to{' '}
+            <span className="bg-gradient-to-r from-primary-400 via-purple-400 to-primary-400 bg-clip-text text-transparent">
+              NinjaTrader
+            </span>{' '}
+            Instantly
           </h1>
-          <p className="text-xl text-gray-400 mb-8">
+          
+          <p className="text-xl text-surface-400 mb-10 max-w-2xl mx-auto leading-relaxed">
             Automate your trading by syncing signals from Discord to NinjaTrader in real-time. 
             Perfect for signal providers and their subscribers.
           </p>
-          <div className="flex justify-center gap-4">
-            <Link to="/register" className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700">
-              Start Free Trial
+          
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link to="/register">
+              <Button size="lg" className="w-full sm:w-auto">
+                Start Free Trial
+              </Button>
             </Link>
-            <a href="#features" className="border border-gray-600 text-white px-8 py-3 rounded-lg text-lg hover:bg-gray-800">
-              Learn More
+            <a href="#features">
+              <Button variant="secondary" size="lg" className="w-full sm:w-auto">
+                Learn More
+              </Button>
             </a>
           </div>
         </div>
       </section>
 
       {/* Features */}
-      <section id="features" className="py-20 px-4 bg-gray-800/50">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">How It Works</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-gray-800 rounded-lg p-6">
-              <div className="text-4xl mb-4">📡</div>
-              <h3 className="text-xl font-semibold text-white mb-2">1. Send Signals</h3>
-              <p className="text-gray-400">
-                Use the /trade command in Discord to broadcast signals to all your subscribers instantly.
-              </p>
-            </div>
-            <div className="bg-gray-800 rounded-lg p-6">
-              <div className="text-4xl mb-4">⚡</div>
-              <h3 className="text-xl font-semibold text-white mb-2">2. Real-Time Delivery</h3>
-              <p className="text-gray-400">
-                Signals are delivered via WebSocket in milliseconds. No polling, no delays.
-              </p>
-            </div>
-            <div className="bg-gray-800 rounded-lg p-6">
-              <div className="text-4xl mb-4">🎯</div>
-              <h3 className="text-xl font-semibold text-white mb-2">3. Auto Execute</h3>
-              <p className="text-gray-400">
-                NinjaTrader receives the signal and executes the trade automatically with your settings.
-              </p>
-            </div>
+      <section id="features" className="py-24 px-4 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-surface-950 via-surface-900/50 to-surface-950" />
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">How It Works</h2>
+            <p className="text-surface-400 max-w-2xl mx-auto">
+              Three simple steps to automate your trading workflow
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            <FeatureCard
+              icon="📡"
+              step="1"
+              title="Send Signals"
+              description="Use the /trade command in Discord to broadcast signals to all your subscribers instantly."
+            />
+            <FeatureCard
+              icon="⚡"
+              step="2"
+              title="Real-Time Delivery"
+              description="Signals are delivered via WebSocket in milliseconds. No polling, no delays."
+            />
+            <FeatureCard
+              icon="🎯"
+              step="3"
+              title="Auto Execute"
+              description="NinjaTrader receives the signal and executes the trade automatically with your settings."
+            />
           </div>
         </div>
       </section>
 
       {/* For Hosts */}
-      <section className="py-20 px-4">
+      <section className="py-24 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold text-white mb-6">For Signal Providers</h2>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 border border-primary-500/20 text-sm text-primary-400 mb-6">
+                For Signal Providers
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                Everything you need to run a signal service
+              </h2>
               <ul className="space-y-4">
-                <li className="flex items-start gap-3">
-                  <span className="text-green-500 text-xl">✓</span>
-                  <span className="text-gray-300">Discord bot with /trade command</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-green-500 text-xl">✓</span>
-                  <span className="text-gray-300">Dashboard to manage subscribers</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-green-500 text-xl">✓</span>
-                  <span className="text-gray-300">Trade analytics and performance tracking</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-green-500 text-xl">✓</span>
-                  <span className="text-gray-300">Whop integration for payments</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-green-500 text-xl">✓</span>
-                  <span className="text-gray-300">Invite links for easy onboarding</span>
-                </li>
+                {[
+                  'Discord bot with /trade command',
+                  'Dashboard to manage subscribers',
+                  'Trade analytics and performance tracking',
+                  'Whop integration for payments',
+                  'Invite links for easy onboarding',
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-emerald-400 text-sm">✓</span>
+                    </span>
+                    <span className="text-surface-300">{item}</span>
+                  </li>
+                ))}
               </ul>
-              <Link to="/register" className="inline-block mt-8 bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700">
-                Create Host Account
+              <Link to="/register" className="inline-block mt-8">
+                <Button>Create Host Account</Button>
               </Link>
             </div>
-            <div className="bg-gray-800 rounded-lg p-6">
-              <div className="bg-gray-900 rounded p-4 font-mono text-sm">
-                <p className="text-gray-500"># Discord command</p>
-                <p className="text-green-400">/trade symbol:ES side:BUY entry:5000 sl:4990 tp:5020</p>
-                <p className="text-gray-500 mt-4"># Delivered to all subscribers instantly</p>
-                <p className="text-blue-400">→ 15 subscribers notified</p>
-                <p className="text-blue-400">→ 12 trades executed</p>
+            
+            <div className="bg-surface-800/50 backdrop-blur-sm rounded-2xl p-6 border border-surface-700/50">
+              <div className="bg-surface-900 rounded-xl p-5 font-mono text-sm">
+                <p className="text-surface-500"># Discord command</p>
+                <p className="text-emerald-400 mt-2">/trade symbol:ES side:BUY entry:5000 sl:4990 tp:5020</p>
+                <div className="h-px bg-surface-700 my-4" />
+                <p className="text-surface-500"># Delivered to all subscribers instantly</p>
+                <p className="text-primary-400 mt-2">→ 15 subscribers notified</p>
+                <p className="text-primary-400">→ 12 trades executed</p>
               </div>
             </div>
           </div>
@@ -121,56 +152,52 @@ export default function Landing() {
       </section>
 
       {/* For Subscribers */}
-      <section className="py-20 px-4 bg-gray-800/50">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-24 px-4 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-surface-950 via-surface-900/50 to-surface-950" />
+        <div className="max-w-6xl mx-auto relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="order-2 md:order-1 bg-gray-800 rounded-lg p-6">
-              <h4 className="text-gray-400 text-sm mb-4">Subscriber Settings</h4>
+            <div className="order-2 md:order-1 bg-surface-800/50 backdrop-blur-sm rounded-2xl p-6 border border-surface-700/50">
+              <h4 className="text-surface-400 text-sm mb-4 font-medium">Subscriber Settings</h4>
               <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-gray-900 rounded">
-                  <span className="text-gray-300">Max trades/day</span>
-                  <span className="text-white">10</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-gray-900 rounded">
-                  <span className="text-gray-300">Sessions</span>
-                  <span className="text-white">NY, London</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-gray-900 rounded">
-                  <span className="text-gray-300">Max daily loss</span>
-                  <span className="text-white">$500</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-gray-900 rounded">
-                  <span className="text-gray-300">Position size</span>
-                  <span className="text-white">2 contracts</span>
-                </div>
+                {[
+                  { label: 'Max trades/day', value: '10' },
+                  { label: 'Sessions', value: 'NY, London' },
+                  { label: 'Max daily loss', value: '$500' },
+                  { label: 'Position size', value: '2 contracts' },
+                ].map((item, i) => (
+                  <div key={i} className="flex justify-between items-center p-3 bg-surface-900/50 rounded-lg border border-surface-700/30">
+                    <span className="text-surface-400">{item.label}</span>
+                    <span className="text-white font-medium">{item.value}</span>
+                  </div>
+                ))}
               </div>
             </div>
+            
             <div className="order-1 md:order-2">
-              <h2 className="text-3xl font-bold text-white mb-6">For Subscribers</h2>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-sm text-purple-400 mb-6">
+                For Subscribers
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                Full control over your trading
+              </h2>
               <ul className="space-y-4">
-                <li className="flex items-start gap-3">
-                  <span className="text-green-500 text-xl">✓</span>
-                  <span className="text-gray-300">Customize trading sessions (NY, London, Asia)</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-green-500 text-xl">✓</span>
-                  <span className="text-gray-300">Set daily trade limits</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-green-500 text-xl">✓</span>
-                  <span className="text-gray-300">Risk management (max loss, position size)</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-green-500 text-xl">✓</span>
-                  <span className="text-gray-300">Symbol whitelist/blacklist</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-green-500 text-xl">✓</span>
-                  <span className="text-gray-300">Trade history and analytics</span>
-                </li>
+                {[
+                  'Customize trading sessions (NY, London, Asia)',
+                  'Set daily trade limits',
+                  'Risk management (max loss, position size)',
+                  'Symbol whitelist/blacklist',
+                  'Trade history and analytics',
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-emerald-400 text-sm">✓</span>
+                    </span>
+                    <span className="text-surface-300">{item}</span>
+                  </li>
+                ))}
               </ul>
-              <Link to="/subscriber/login" className="inline-block mt-8 bg-purple-600 text-white px-6 py-3 rounded hover:bg-purple-700">
-                Subscriber Portal
+              <Link to="/subscriber/login" className="inline-block mt-8">
+                <Button variant="secondary">Subscriber Portal</Button>
               </Link>
             </div>
           </div>
@@ -178,33 +205,57 @@ export default function Landing() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-4">
+      <section className="py-24 px-4">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-6">Ready to Automate Your Trading?</h2>
-          <p className="text-gray-400 mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            Ready to Automate Your Trading?
+          </h2>
+          <p className="text-surface-400 mb-10 text-lg">
             Join signal providers who trust CopyBot to deliver their trades to subscribers in real-time.
           </p>
-          <Link to="/register" className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700">
-            Get Started Free
+          <Link to="/register">
+            <Button size="lg">Get Started Free</Button>
           </Link>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-800 py-8 px-4">
+      <footer className="border-t border-surface-800/50 py-8 px-4">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🤖</span>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-purple-500 flex items-center justify-center text-sm">
+              🤖
+            </div>
             <span className="text-white font-semibold">CopyBot</span>
           </div>
-          <div className="flex gap-6 text-gray-400 text-sm">
-            <Link to="/login" className="hover:text-white">Host Login</Link>
-            <Link to="/subscriber/login" className="hover:text-white">Subscriber Login</Link>
-            <Link to="/admin/login" className="hover:text-white">Admin</Link>
+          <div className="flex gap-6 text-surface-400 text-sm">
+            <Link to="/login" className="hover:text-white transition-colors">Host Login</Link>
+            <Link to="/subscriber/login" className="hover:text-white transition-colors">Subscriber Login</Link>
+            <Link to="/admin/login" className="hover:text-white transition-colors">Admin</Link>
           </div>
-          <p className="text-gray-500 text-sm">© 2024 CopyBot. All rights reserved.</p>
+          <p className="text-surface-500 text-sm">© 2024 CopyBot. All rights reserved.</p>
         </div>
       </footer>
+    </div>
+  )
+}
+
+function FeatureCard({ icon, step, title, description }) {
+  return (
+    <div className="group relative bg-surface-800/30 backdrop-blur-sm rounded-2xl p-6 border border-surface-700/50 hover:border-primary-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary-500/5">
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity rounded-t-2xl" />
+      
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500/20 to-purple-500/20 flex items-center justify-center text-2xl">
+          {icon}
+        </div>
+        <span className="text-xs font-medium text-surface-500 bg-surface-800 px-2 py-1 rounded-full">
+          Step {step}
+        </span>
+      </div>
+      
+      <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
+      <p className="text-surface-400 leading-relaxed">{description}</p>
     </div>
   )
 }

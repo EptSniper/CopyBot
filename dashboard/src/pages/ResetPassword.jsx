@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useSearchParams, useNavigate } from 'react-router-dom'
+import { Card, CardContent, Button, Input } from '../components/ui'
 
 const API_BASE = import.meta.env.VITE_API_URL || ''
 
@@ -49,73 +50,86 @@ export default function ResetPassword() {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        <div className="bg-gray-800 p-8 rounded-lg max-w-md w-full text-center">
-          <div className="text-red-400 text-5xl mb-4">✕</div>
-          <h1 className="text-2xl font-bold text-white mb-2">Invalid Link</h1>
-          <p className="text-gray-400 mb-6">This password reset link is invalid or has expired.</p>
-          <Link to="/forgot-password" className="text-blue-400 hover:text-blue-300">
-            Request a new link
-          </Link>
+      <div className="min-h-screen bg-surface-950 flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-red-500/10 rounded-full blur-3xl" />
         </div>
+        <Card className="max-w-md w-full relative z-10 animate-fade-in" hover={false}>
+          <CardContent className="p-8 text-center">
+            <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-6">
+              <span className="text-red-400 text-3xl">✕</span>
+            </div>
+            <h1 className="text-2xl font-bold text-white mb-2">Invalid Link</h1>
+            <p className="text-surface-400 mb-6">This password reset link is invalid or has expired.</p>
+            <Link to="/forgot-password" className="text-primary-400 hover:text-primary-300 transition-colors">
+              Request a new link
+            </Link>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        <div className="bg-gray-800 p-8 rounded-lg max-w-md w-full text-center">
-          <div className="text-green-400 text-5xl mb-4">✓</div>
-          <h1 className="text-2xl font-bold text-white mb-2">Password Reset!</h1>
-          <p className="text-gray-400 mb-6">Your password has been changed. Redirecting to login...</p>
+      <div className="min-h-screen bg-surface-950 flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
         </div>
+        <Card className="max-w-md w-full relative z-10 animate-fade-in" hover={false}>
+          <CardContent className="p-8 text-center">
+            <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-6">
+              <span className="text-emerald-400 text-3xl">✓</span>
+            </div>
+            <h1 className="text-2xl font-bold text-white mb-2">Password Reset!</h1>
+            <p className="text-surface-400">Your password has been changed. Redirecting to login...</p>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="bg-gray-800 p-8 rounded-lg max-w-md w-full">
-        <h1 className="text-2xl font-bold text-white mb-2">Reset Password</h1>
-        <p className="text-gray-400 mb-6">Enter your new password below.</p>
+    <div className="min-h-screen bg-surface-950 flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+      </div>
+      
+      <Card className="max-w-md w-full relative z-10 animate-fade-in" hover={false}>
+        <CardContent className="p-8">
+          <h1 className="text-2xl font-bold text-white mb-2">Reset Password</h1>
+          <p className="text-surface-400 mb-6">Enter your new password below.</p>
 
-        {error && (
-          <div className="bg-red-900/50 text-red-200 p-3 rounded mb-4">{error}</div>
-        )}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg mb-6 text-sm">
+              {error}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-gray-300 mb-1">New Password</label>
-            <input
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <Input
+              label="New Password"
               type="password"
               required
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="w-full bg-gray-700 text-white p-3 rounded focus:ring-2 focus:ring-blue-500 outline-none"
               placeholder="At least 8 characters"
             />
-          </div>
-          <div>
-            <label className="block text-gray-300 mb-1">Confirm Password</label>
-            <input
+            <Input
+              label="Confirm Password"
               type="password"
               required
               value={confirmPassword}
               onChange={e => setConfirmPassword(e.target.value)}
-              className="w-full bg-gray-700 text-white p-3 rounded focus:ring-2 focus:ring-blue-500 outline-none"
               placeholder="Confirm your password"
             />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white py-3 rounded font-semibold"
-          >
-            {loading ? 'Resetting...' : 'Reset Password'}
-          </button>
-        </form>
-      </div>
+            <Button type="submit" loading={loading} className="w-full">
+              Reset Password
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }
