@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { Card, CardContent, CardTitle, StatCard, Button, Input, Badge, SkeletonCard, SkeletonTable } from '../../components/ui'
 
 const API_BASE = import.meta.env.VITE_API_URL || ''
@@ -111,6 +111,55 @@ export default function AdminDashboard() {
             {error}
           </div>
         )}
+
+        {/* Quick Links */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <Link to="/admin/health">
+            <Card className="h-full hover:border-emerald-500/50 transition-colors cursor-pointer">
+              <CardContent className="text-center py-4">
+                <div className="text-3xl mb-2">💚</div>
+                <p className="font-medium text-white">System Health</p>
+                <p className="text-xs text-surface-400">API, DB, WebSocket</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to="/admin/security">
+            <Card className="h-full hover:border-red-500/50 transition-colors cursor-pointer">
+              <CardContent className="text-center py-4">
+                <div className="text-3xl mb-2">🔐</div>
+                <p className="font-medium text-white">Security</p>
+                <p className="text-xs text-surface-400">Rate limits, IPs</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to="/admin/delivery">
+            <Card className="h-full hover:border-blue-500/50 transition-colors cursor-pointer">
+              <CardContent className="text-center py-4">
+                <div className="text-3xl mb-2">📡</div>
+                <p className="font-medium text-white">Delivery Stats</p>
+                <p className="text-xs text-surface-400">Signals, webhooks</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to="/admin/database">
+            <Card className="h-full hover:border-purple-500/50 transition-colors cursor-pointer">
+              <CardContent className="text-center py-4">
+                <div className="text-3xl mb-2">🗄️</div>
+                <p className="font-medium text-white">Database</p>
+                <p className="text-xs text-surface-400">Tables, connections</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to="/admin/logs">
+            <Card className="h-full hover:border-yellow-500/50 transition-colors cursor-pointer">
+              <CardContent className="text-center py-4">
+                <div className="text-3xl mb-2">📜</div>
+                <p className="font-medium text-white">Logs</p>
+                <p className="text-xs text-surface-400">System logs</p>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
 
         {/* Stats Grid */}
         {stats && (

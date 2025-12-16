@@ -6,7 +6,15 @@ const { WebSocketServer } = require('ws');
 const { query } = require('./db');
 const { verifyAccessToken } = require('./lib/auth');
 const { shouldDeliverSignal, applyPositionSizeLimit } = require('./lib/preferences');
-const { rateLimit, authRateLimit, apiRateLimit, signalRateLimit, securityHeaders, requestLogger, sanitizeObject } = require('./lib/security');
+const security = require('./lib/security');
+const { securityHeaders, requestLogger, sanitizeObject, apiRateLimit } = security;
+
+// Global tracking for admin dashboard
+global.serverStartTime = Date.now();
+global.rateLimitStore = security.rateLimitStore || new Map();
+global.securityStats = { blocked: 0, failedAuth: 0, requestsByIP: new Map() };
+global.maintenanceMode = false;
+global.systemBroadcast = null;
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -28,14 +36,19 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: '/ws' });
 const subscriberConnections = new Map();
 
+// Track WebSocket connections for admin dashboard
+global.wsConnectionCount = 0;
+
 wss.on('connection', async (ws, req) => {
+  global.wsConnectionCount++;
+  
   const url = new URL(req.url, `http://localhost:${PORT}`);
   const apiKey = url.searchParams.get('key');
   
-  if (!apiKey) { ws.close(4001, 'API key required'); return; }
+  if (!apiKey) { ws.close(4001, 'API key required'); global.wsConnectionCount--; return; }
   
   const sub = await one('SELECT * FROM subscribers WHERE api_key = $1 AND status = $2', [apiKey, 'active']);
-  if (!sub) { ws.close(4002, 'Invalid API key'); return; }
+  if (!sub) { ws.close(4002, 'Invalid API key'); global.wsConnectionCount--; return; }
   
   console.log(`WebSocket: Subscriber ${sub.id} connected`);
   subscriberConnections.set(sub.id, ws);
@@ -43,6 +56,7 @@ wss.on('connection', async (ws, req) => {
   ws.on('close', () => {
     console.log(`WebSocket: Subscriber ${sub.id} disconnected`);
     subscriberConnections.delete(sub.id);
+    global.wsConnectionCount--;
   });
   
   ws.on('message', (data) => {

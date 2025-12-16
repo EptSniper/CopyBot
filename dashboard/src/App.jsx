@@ -13,6 +13,11 @@ import Invites from './pages/Invites'
 import AdminLogin from './pages/admin/AdminLogin'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminHostDetail from './pages/admin/AdminHostDetail'
+import AdminSystemHealth from './pages/admin/AdminSystemHealth'
+import AdminSecurity from './pages/admin/AdminSecurity'
+import AdminDeliveryStats from './pages/admin/AdminDeliveryStats'
+import AdminDbStats from './pages/admin/AdminDbStats'
+import AdminLogs from './pages/admin/AdminLogs'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import Activate from './pages/Activate'
@@ -42,6 +47,11 @@ export default function App() {
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/hosts/:id" element={<AdminHostDetail />} />
+      <Route path="/admin/health" element={<AdminSystemHealth />} />
+      <Route path="/admin/security" element={<AdminSecurity />} />
+      <Route path="/admin/delivery" element={<AdminDeliveryStats />} />
+      <Route path="/admin/database" element={<AdminDbStats />} />
+      <Route path="/admin/logs" element={<AdminLogs />} />
       
       {/* Subscriber portal routes */}
       <Route path="/subscriber/login" element={<SubscriberLogin />} />

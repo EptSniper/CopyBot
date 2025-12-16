@@ -14,7 +14,7 @@ setInterval(() => {
 }, 300000)
 
 // Rate limiter middleware
-export function rateLimit(options = {}) {
+function rateLimit(options = {}) {
   const {
     windowMs = 60000, // 1 minute
     max = 100, // max requests per window
@@ -35,12 +35,20 @@ export function rateLimit(options = {}) {
     data.count++
     rateLimitStore.set(key, data)
     
+    // Track IP for admin stats
+    if (global.securityStats?.requestsByIP) {
+      const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown'
+      const current = global.securityStats.requestsByIP.get(ip) || 0
+      global.securityStats.requestsByIP.set(ip, current + 1)
+    }
+    
     // Set rate limit headers
     res.setHeader('X-RateLimit-Limit', max)
     res.setHeader('X-RateLimit-Remaining', Math.max(0, max - data.count))
     res.setHeader('X-RateLimit-Reset', Math.ceil((data.windowStart + windowMs) / 1000))
     
     if (data.count > max) {
+      if (global.securityStats) global.securityStats.blocked++
       return res.status(429).json({ error: message })
     }
     
@@ -48,29 +56,30 @@ export function rateLimit(options = {}) {
   }
 }
 
+
 // Strict rate limiter for auth endpoints
-export const authRateLimit = rateLimit({
+const authRateLimit = rateLimit({
   windowMs: 60000 * 15, // 15 minutes
   max: 10, // 10 attempts per 15 minutes
   message: 'Too many login attempts, please try again in 15 minutes'
 })
 
 // API rate limiter
-export const apiRateLimit = rateLimit({
+const apiRateLimit = rateLimit({
   windowMs: 60000, // 1 minute
   max: 100,
   message: 'Rate limit exceeded'
 })
 
 // Signal rate limiter (more generous)
-export const signalRateLimit = rateLimit({
+const signalRateLimit = rateLimit({
   windowMs: 60000,
   max: 60, // 1 signal per second average
   message: 'Signal rate limit exceeded'
 })
 
 // Input sanitization
-export function sanitizeInput(input) {
+function sanitizeInput(input) {
   if (typeof input !== 'string') return input
   return input
     .replace(/[<>]/g, '') // Remove potential HTML tags
@@ -79,7 +88,7 @@ export function sanitizeInput(input) {
 }
 
 // Sanitize object recursively
-export function sanitizeObject(obj) {
+function sanitizeObject(obj) {
   if (typeof obj !== 'object' || obj === null) {
     return sanitizeInput(obj)
   }
@@ -96,19 +105,18 @@ export function sanitizeObject(obj) {
 }
 
 // Validate email format
-export function isValidEmail(email) {
+function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return emailRegex.test(email)
 }
 
 // Validate API key format
-export function isValidApiKey(key) {
-  // API keys should be alphanumeric with underscores, 20-64 chars
+function isValidApiKey(key) {
   return /^[a-zA-Z0-9_]{20,64}$/.test(key)
 }
 
 // Mask sensitive data for logging
-export function maskSensitive(data) {
+function maskSensitive(data) {
   if (typeof data !== 'object' || data === null) return data
   
   const masked = { ...data }
@@ -124,7 +132,7 @@ export function maskSensitive(data) {
 }
 
 // Security headers middleware
-export function securityHeaders(req, res, next) {
+function securityHeaders(req, res, next) {
   res.setHeader('X-Content-Type-Options', 'nosniff')
   res.setHeader('X-Frame-Options', 'DENY')
   res.setHeader('X-XSS-Protection', '1; mode=block')
@@ -134,7 +142,7 @@ export function securityHeaders(req, res, next) {
 }
 
 // Request logging with masked sensitive data
-export function requestLogger(req, res, next) {
+function requestLogger(req, res, next) {
   const start = Date.now()
   
   res.on('finish', () => {
@@ -147,7 +155,6 @@ export function requestLogger(req, res, next) {
       ip: req.ip || req.headers['x-forwarded-for']
     }
     
-    // Only log body for non-GET requests, masked
     if (req.method !== 'GET' && req.body) {
       log.body = maskSensitive(req.body)
     }
@@ -156,4 +163,19 @@ export function requestLogger(req, res, next) {
   })
   
   next()
+}
+
+module.exports = {
+  rateLimitStore,
+  rateLimit,
+  authRateLimit,
+  apiRateLimit,
+  signalRateLimit,
+  sanitizeInput,
+  sanitizeObject,
+  isValidEmail,
+  isValidApiKey,
+  maskSensitive,
+  securityHeaders,
+  requestLogger
 }

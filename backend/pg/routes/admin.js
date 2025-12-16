@@ -278,13 +278,24 @@ router.get('/logs', async (req, res) => {
     const limit = Math.min(200, parseInt(req.query.limit) || 100);
     const offset = parseInt(req.query.offset) || 0;
     const level = req.query.level;
+    const search = req.query.search;
     
     let whereClause = '';
     const params = [limit, offset];
+    let paramIdx = 3;
     
+    const conditions = [];
     if (level) {
-      whereClause = 'WHERE level = $3';
+      conditions.push(`level = $${paramIdx++}`);
       params.push(level);
+    }
+    if (search) {
+      conditions.push(`message ILIKE $${paramIdx++}`);
+      params.push(`%${search}%`);
+    }
+    
+    if (conditions.length > 0) {
+      whereClause = 'WHERE ' + conditions.join(' AND ');
     }
     
     const logs = await all(
@@ -297,6 +308,311 @@ router.get('/logs', async (req, res) => {
     console.error('Get logs error:', err);
     res.status(500).json({ error: 'failed to get logs' });
   }
+});
+
+// ============ SYSTEM HEALTH & MONITORING ============
+
+// System health endpoint
+router.get('/health', async (req, res) => {
+  try {
+    const startTime = global.serverStartTime || Date.now();
+    const uptime = Math.floor((Date.now() - startTime) / 1000);
+    
+    // Database health check
+    const dbStart = Date.now();
+    await query('SELECT 1');
+    const dbLatency = Date.now() - dbStart;
+    
+    // Get pool stats if available
+    const pool = require('../db').pool;
+    const poolStats = pool ? {
+      total: pool.totalCount || 0,
+      idle: pool.idleCount || 0,
+      waiting: pool.waitingCount || 0
+    } : { total: 0, idle: 0, waiting: 0 };
+    
+    // Memory usage
+    const mem = process.memoryUsage();
+    
+    // WebSocket connections (from global if available)
+    const wsConnections = global.wsConnectionCount || 0;
+    
+    // Determine overall status
+    let status = 'healthy';
+    if (dbLatency > 1000) status = 'degraded';
+    if (dbLatency > 5000) status = 'critical';
+    
+    res.json({
+      status,
+      api: {
+        status: 'online',
+        uptime,
+        version: process.env.npm_package_version || '1.0.0',
+        nodeVersion: process.version
+      },
+      database: {
+        status: 'connected',
+        latency: dbLatency,
+        pool: poolStats
+      },
+      websocket: {
+        status: 'running',
+        connections: wsConnections
+      },
+      memory: {
+        used: mem.heapUsed,
+        total: mem.heapTotal,
+        rss: mem.rss,
+        percentage: Math.round((mem.heapUsed / mem.heapTotal) * 100)
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error('Health check error:', err);
+    res.json({
+      status: 'critical',
+      api: { status: 'online' },
+      database: { status: 'error', error: err.message },
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Security metrics endpoint
+router.get('/security', async (req, res) => {
+  try {
+    // Get rate limit stats from global store
+    const rateLimitStore = global.rateLimitStore || new Map();
+    const securityStats = global.securityStats || { 
+      blocked: 0, 
+      failedAuth: 0,
+      requestsByIP: new Map()
+    };
+    
+    // Calculate rate limit stats
+    const now = Date.now();
+    let authRequests = 0, apiRequests = 0, signalRequests = 0;
+    let authBlocked = 0, apiBlocked = 0, signalBlocked = 0;
+    
+    for (const [key, data] of rateLimitStore.entries()) {
+      if (now - data.windowStart < 60000) {
+        if (key.includes('auth')) {
+          authRequests += data.count;
+          if (data.count > 10) authBlocked++;
+        } else if (key.includes('signal')) {
+          signalRequests += data.count;
+          if (data.count > 60) signalBlocked++;
+        } else {
+          apiRequests += data.count;
+          if (data.count > 100) apiBlocked++;
+        }
+      }
+    }
+    
+    // Get top IPs
+    const topIPs = [];
+    const ipMap = securityStats.requestsByIP || new Map();
+    for (const [ip, count] of ipMap.entries()) {
+      topIPs.push({ ip, requests: count, blocked: count > 1000 });
+    }
+    topIPs.sort((a, b) => b.requests - a.requests);
+    
+    res.json({
+      rateLimits: {
+        auth: { current: authRequests, limit: 10, blocked: authBlocked },
+        api: { current: apiRequests, limit: 100, blocked: apiBlocked },
+        signals: { current: signalRequests, limit: 60, blocked: signalBlocked }
+      },
+      blocked24h: securityStats.blocked || 0,
+      failedAuth24h: securityStats.failedAuth || 0,
+      topIPs: topIPs.slice(0, 10),
+      suspiciousActivity: (securityStats.blocked || 0) > 100 || (securityStats.failedAuth || 0) > 50,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error('Security metrics error:', err);
+    res.status(500).json({ error: 'failed to get security metrics' });
+  }
+});
+
+// Delivery statistics endpoint
+router.get('/delivery-stats', async (req, res) => {
+  try {
+    const days = parseInt(req.query.days) || 7;
+    
+    // Signal delivery stats
+    const deliveryStats = await one(`
+      SELECT
+        COUNT(DISTINCT s.id) as total_signals,
+        COUNT(d.id) as total_deliveries,
+        COUNT(d.id) FILTER (WHERE d.status = 'delivered' OR d.status = 'executed') as delivered,
+        COUNT(d.id) FILTER (WHERE d.status = 'pending') as pending,
+        COUNT(d.id) FILTER (WHERE d.status = 'failed') as failed,
+        COUNT(d.id) FILTER (WHERE d.status = 'skipped') as skipped,
+        AVG(EXTRACT(EPOCH FROM (d.delivered_at - s.created_at)) * 1000) FILTER (WHERE d.delivered_at IS NOT NULL) as avg_latency
+      FROM signals s
+      LEFT JOIN deliveries d ON d.signal_id = s.id
+      WHERE s.created_at > NOW() - INTERVAL '1 day' * $1
+    `, [days]);
+    
+    // Error breakdown
+    const errorBreakdown = await all(`
+      SELECT error, COUNT(*) as count
+      FROM deliveries
+      WHERE status = 'failed' AND created_at > NOW() - INTERVAL '1 day' * $1
+      GROUP BY error
+      ORDER BY count DESC
+      LIMIT 10
+    `, [days]);
+    
+    // Webhook stats
+    const webhookStats = await one(`
+      SELECT
+        COUNT(*) as total,
+        COUNT(*) FILTER (WHERE status = 'success') as success,
+        COUNT(*) FILTER (WHERE status = 'failed') as failed,
+        SUM(attempts) as total_attempts
+      FROM webhook_logs
+      WHERE created_at > NOW() - INTERVAL '1 day' * $1
+    `, [days]);
+    
+    const total = parseInt(deliveryStats?.total_deliveries) || 1;
+    const delivered = parseInt(deliveryStats?.delivered) || 0;
+    const successRate = total > 0 ? Math.round((delivered / total) * 100) : 0;
+    
+    res.json({
+      period: `${days} days`,
+      signals: {
+        total: parseInt(deliveryStats?.total_signals) || 0,
+        delivered: delivered,
+        pending: parseInt(deliveryStats?.pending) || 0,
+        failed: parseInt(deliveryStats?.failed) || 0,
+        skipped: parseInt(deliveryStats?.skipped) || 0
+      },
+      successRate,
+      errorBreakdown: errorBreakdown || [],
+      webhooks: {
+        total: parseInt(webhookStats?.total) || 0,
+        success: parseInt(webhookStats?.success) || 0,
+        failed: parseInt(webhookStats?.failed) || 0,
+        retries: parseInt(webhookStats?.total_attempts) || 0
+      },
+      avgLatency: Math.round(parseFloat(deliveryStats?.avg_latency) || 0),
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error('Delivery stats error:', err);
+    res.status(500).json({ error: 'failed to get delivery stats' });
+  }
+});
+
+// Database statistics endpoint
+router.get('/db-stats', async (req, res) => {
+  try {
+    // Table row counts
+    const tables = await all(`
+      SELECT 
+        relname as name,
+        n_live_tup as rows
+      FROM pg_stat_user_tables
+      ORDER BY n_live_tup DESC
+    `);
+    
+    // Database size
+    const dbSize = await one(`
+      SELECT pg_size_pretty(pg_database_size(current_database())) as size
+    `);
+    
+    // Connection stats
+    const connStats = await one(`
+      SELECT 
+        count(*) FILTER (WHERE state = 'active') as active,
+        count(*) FILTER (WHERE state = 'idle') as idle,
+        count(*) as total
+      FROM pg_stat_activity
+      WHERE datname = current_database()
+    `);
+    
+    res.json({
+      tables: tables.map(t => ({
+        name: t.name,
+        rows: parseInt(t.rows) || 0
+      })),
+      totalSize: dbSize?.size || 'unknown',
+      connections: {
+        active: parseInt(connStats?.active) || 0,
+        idle: parseInt(connStats?.idle) || 0,
+        total: parseInt(connStats?.total) || 0
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error('DB stats error:', err);
+    res.status(500).json({ error: 'failed to get database stats' });
+  }
+});
+
+// ============ ADMIN ACTIONS ============
+
+// Clear rate limits
+router.post('/actions/clear-rate-limits', async (req, res) => {
+  try {
+    if (global.rateLimitStore) {
+      global.rateLimitStore.clear();
+    }
+    res.json({ success: true, message: 'Rate limits cleared' });
+  } catch (err) {
+    console.error('Clear rate limits error:', err);
+    res.status(500).json({ error: 'failed to clear rate limits' });
+  }
+});
+
+// Broadcast message
+router.post('/actions/broadcast', async (req, res) => {
+  try {
+    const { message, type = 'info' } = req.body;
+    if (!message) {
+      return res.status(400).json({ error: 'message is required' });
+    }
+    
+    // Store broadcast for retrieval
+    global.systemBroadcast = {
+      message,
+      type,
+      createdAt: new Date().toISOString()
+    };
+    
+    res.json({ success: true, message: 'Broadcast sent' });
+  } catch (err) {
+    console.error('Broadcast error:', err);
+    res.status(500).json({ error: 'failed to send broadcast' });
+  }
+});
+
+// Get current broadcast
+router.get('/actions/broadcast', async (req, res) => {
+  res.json(global.systemBroadcast || null);
+});
+
+// Toggle maintenance mode
+router.post('/actions/maintenance', async (req, res) => {
+  try {
+    const { enabled } = req.body;
+    global.maintenanceMode = enabled !== undefined ? enabled : !global.maintenanceMode;
+    res.json({ 
+      success: true, 
+      maintenanceMode: global.maintenanceMode,
+      message: global.maintenanceMode ? 'Maintenance mode enabled' : 'Maintenance mode disabled'
+    });
+  } catch (err) {
+    console.error('Maintenance mode error:', err);
+    res.status(500).json({ error: 'failed to toggle maintenance mode' });
+  }
+});
+
+// Get maintenance status
+router.get('/actions/maintenance', async (req, res) => {
+  res.json({ maintenanceMode: global.maintenanceMode || false });
 });
 
 // Helpers
