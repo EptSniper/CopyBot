@@ -15,6 +15,12 @@
 body {
   @apply bg-surface-950 text-white antialiased;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Cpath d='M0 150 L20 145 L40 155 L60 140 L80 145 L100 120 L120 130 L140 100 L160 110 L180 80 L200 90 L220 60 L240 75 L260 50 L280 65 L300 40 L320 55 L340 30 L360 45 L380 25 L400 35' fill='none' stroke='%236366f1' stroke-width='1.5' opacity='0.03'/%3E%3Cpath d='M0 170 L25 165 L50 175 L75 160 L100 168 L125 150 L150 158 L175 135 L200 145 L225 120 L250 130 L275 105 L300 115 L325 95 L350 105 L375 85 L400 90' fill='none' stroke='%238b5cf6' stroke-width='1' opacity='0.025'/%3E%3Cpath d='M0 180 L30 178 L60 185 L90 175 L120 180 L150 165 L180 172 L210 155 L240 162 L270 145 L300 152 L330 138 L360 145 L390 130 L400 135' fill='none' stroke='%23a855f7' stroke-width='1' opacity='0.02'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(15, 23, 42, 1) 0%, rgba(15, 23, 42, 0.98) 100%);
+  background-size: 400px 200px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+  background-position: center, center;
 }
 
 /* Custom scrollbar */

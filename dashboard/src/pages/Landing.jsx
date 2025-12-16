@@ -31,8 +31,49 @@ export default function Landing() {
 
       {/* Hero */}
       <section className="relative py-24 px-4 overflow-hidden">
-        {/* Background gradient effects */}
+        {/* Stock chart background pattern */}
         <div className="absolute inset-0 overflow-hidden">
+          <svg className="absolute inset-0 w-full h-full opacity-[0.07]" preserveAspectRatio="none" viewBox="0 0 1200 600">
+            {/* Main uptrend line */}
+            <path 
+              d="M0 500 L50 480 L100 490 L150 450 L200 460 L250 400 L300 420 L350 350 L400 370 L450 300 L500 320 L550 250 L600 270 L650 200 L700 230 L750 180 L800 200 L850 150 L900 170 L950 120 L1000 140 L1050 100 L1100 120 L1150 80 L1200 100" 
+              fill="none" 
+              stroke="url(#chartGradient)" 
+              strokeWidth="3"
+              className="animate-pulse"
+            />
+            {/* Secondary line */}
+            <path 
+              d="M0 520 L60 510 L120 530 L180 490 L240 510 L300 460 L360 480 L420 420 L480 440 L540 380 L600 400 L660 340 L720 360 L780 300 L840 320 L900 270 L960 290 L1020 240 L1080 260 L1140 220 L1200 240" 
+              fill="none" 
+              stroke="url(#chartGradient2)" 
+              strokeWidth="2"
+              opacity="0.6"
+            />
+            {/* Candlestick-like vertical bars */}
+            {[100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100].map((x, i) => (
+              <g key={i}>
+                <line x1={x} y1={450 - i * 30} x2={x} y2={480 - i * 30} stroke="#6366f1" strokeWidth="4" opacity="0.15" />
+                <line x1={x} y1={440 - i * 30} x2={x} y2={490 - i * 30} stroke="#6366f1" strokeWidth="1" opacity="0.1" />
+              </g>
+            ))}
+            {/* Grid lines */}
+            {[100, 200, 300, 400, 500].map((y) => (
+              <line key={y} x1="0" y1={y} x2="1200" y2={y} stroke="#6366f1" strokeWidth="0.5" opacity="0.1" strokeDasharray="5,5" />
+            ))}
+            <defs>
+              <linearGradient id="chartGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#6366f1" />
+                <stop offset="50%" stopColor="#8b5cf6" />
+                <stop offset="100%" stopColor="#a855f7" />
+              </linearGradient>
+              <linearGradient id="chartGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#3b82f6" />
+                <stop offset="100%" stopColor="#6366f1" />
+              </linearGradient>
+            </defs>
+          </svg>
+          {/* Gradient orbs */}
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/20 rounded-full blur-3xl animate-pulse-glow" />
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1s' }} />
         </div>
