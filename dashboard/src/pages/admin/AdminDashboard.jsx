@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Card, CardContent, CardTitle, StatCard, Button, Input, Badge } from '../../components/ui'
+import { Card, CardContent, CardTitle, StatCard, Button, Input, Badge, SkeletonCard, SkeletonTable } from '../../components/ui'
 
 const API_BASE = import.meta.env.VITE_API_URL || ''
 
@@ -73,8 +73,18 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-surface-400">Loading...</div>
+      <div className="min-h-screen text-white">
+        <header className="bg-surface-900/95 backdrop-blur-md border-b border-surface-800 sticky top-0 z-50">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <div className="h-10 w-48 bg-surface-700/50 rounded animate-pulse" />
+          </div>
+        </header>
+        <main className="max-w-7xl mx-auto p-6 space-y-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1,2,3,4,5,6,7,8].map(i => <SkeletonCard key={i} />)}
+          </div>
+          <Card><CardContent><SkeletonTable rows={5} cols={9} /></CardContent></Card>
+        </main>
       </div>
     )
   }

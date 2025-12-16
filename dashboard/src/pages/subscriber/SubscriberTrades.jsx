@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Card, CardContent, Button, Badge } from '../../components/ui'
+import { Card, CardContent, Button, Badge, SkeletonTable } from '../../components/ui'
 
 export default function SubscriberTrades() {
   const [trades, setTrades] = useState([])
@@ -51,8 +51,15 @@ export default function SubscriberTrades() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-surface-400">Loading...</div>
+      <div className="min-h-screen">
+        <header className="bg-surface-900/95 backdrop-blur-md border-b border-surface-800 sticky top-0 z-50">
+          <div className="max-w-6xl mx-auto px-4 py-4">
+            <div className="h-8 w-48 bg-surface-700/50 rounded animate-pulse" />
+          </div>
+        </header>
+        <main className="max-w-6xl mx-auto px-4 py-8">
+          <Card><CardContent><SkeletonTable rows={8} cols={6} /></CardContent></Card>
+        </main>
       </div>
     )
   }
