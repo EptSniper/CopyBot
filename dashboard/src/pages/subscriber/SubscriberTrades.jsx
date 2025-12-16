@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Card, CardContent, Button, Badge, SkeletonTable } from '../../components/ui'
+import { Card, CardContent, Button, Badge, SkeletonTable, useToast } from '../../components/ui'
+import { exportToCSV, formatTradesForExport } from '../../lib/export'
 
 export default function SubscriberTrades() {
   const [trades, setTrades] = useState([])
@@ -64,6 +65,17 @@ export default function SubscriberTrades() {
     )
   }
 
+  const toast = useToast()
+
+  const handleExport = () => {
+    if (trades.length === 0) {
+      toast.error('No trades to export')
+      return
+    }
+    exportToCSV(formatTradesForExport(trades), 'trades')
+    toast.success('Trades exported to CSV')
+  }
+
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -75,7 +87,14 @@ export default function SubscriberTrades() {
             </Link>
             <h1 className="text-xl font-bold text-white">Trade History</h1>
           </div>
-          <span className="text-surface-400">{pagination.total} total trades</span>
+          <div className="flex items-center gap-4">
+            <span className="text-surface-400">{pagination.total} total trades</span>
+            {trades.length > 0 && (
+              <Button variant="secondary" size="sm" onClick={handleExport}>
+                📥 Export
+              </Button>
+            )}
+          </div>
         </div>
       </header>
 
