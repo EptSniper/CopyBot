@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/auth'
+import { useThemeStore } from '../store/theme'
 import { Button } from './ui'
 
 const navItems = [
@@ -14,6 +15,7 @@ const navItems = [
 
 export default function Layout() {
   const { user, host, logout } = useAuthStore()
+  const { theme, toggleTheme } = useThemeStore()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -95,19 +97,27 @@ export default function Layout() {
 
         {/* User section */}
         <div className="p-4 border-t border-surface-800">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex-1 min-w-0">
               <p className="text-sm text-white font-medium truncate">{user?.email}</p>
               <p className="text-xs text-surface-500">Host Account</p>
             </div>
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={handleLogout}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-surface-800 hover:bg-surface-700 transition-colors"
+              title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             >
-              Logout
-            </Button>
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
           </div>
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={handleLogout}
+            className="w-full"
+          >
+            Logout
+          </Button>
         </div>
       </aside>
 

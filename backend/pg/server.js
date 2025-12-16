@@ -6,6 +6,7 @@ const { WebSocketServer } = require('ws');
 const { query } = require('./db');
 const { verifyAccessToken } = require('./lib/auth');
 const { shouldDeliverSignal, applyPositionSizeLimit } = require('./lib/preferences');
+const { rateLimit, authRateLimit, apiRateLimit, signalRateLimit, securityHeaders, requestLogger, sanitizeObject } = require('./lib/security');
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -73,6 +74,10 @@ function pushSignalToSubscribers(subscriberIds, trade, signalId) {
   }
 }
 
+// Security middleware
+app.use(securityHeaders);
+app.use(requestLogger);
+
 // CORS
 app.use(cors({
   origin: [FRONTEND_URL, 'http://localhost:3000', 'http://localhost:5173', 'https://copybot-dashboard.onrender.com', /\.onrender\.com$/],
@@ -83,6 +88,17 @@ app.use((req, res, next) => {
   if (req.path === '/billing/webhook' || req.path === '/whop/webhook') next();
   else express.json()(req, res, next);
 });
+
+// Sanitize all request bodies
+app.use((req, res, next) => {
+  if (req.body && typeof req.body === 'object') {
+    req.body = sanitizeObject(req.body);
+  }
+  next();
+});
+
+// Global rate limiting
+app.use(apiRateLimit);
 
 app.get('/health', (_req, res) => res.json({ ok: true, time: Date.now() }));
 

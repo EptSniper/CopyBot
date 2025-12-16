@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import api from '../lib/api'
 import { Card, CardContent, Button, Input, Select, Badge, StatusBadge, useToast, SkeletonTable } from '../components/ui'
+import { exportToCSV, formatSignalsForExport } from '../lib/export'
 
 export default function Signals() {
   const [signals, setSignals] = useState([])
@@ -54,11 +55,27 @@ export default function Signals() {
     )
   }
 
+  const handleExport = () => {
+    if (signals.length === 0) {
+      toast.error('No signals to export')
+      return
+    }
+    exportToCSV(formatSignalsForExport(signals), 'signals')
+    toast.success('Signals exported to CSV')
+  }
+
   return (
     <div className="space-y-6 animate-fade-in">
-      <div>
-        <h1 className="text-3xl font-bold text-white">Signal History</h1>
-        <p className="text-surface-400 mt-1">View and manage your trading signals</p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Signal History</h1>
+          <p className="text-surface-400 mt-1">View and manage your trading signals</p>
+        </div>
+        {signals.length > 0 && (
+          <Button variant="secondary" onClick={handleExport}>
+            📥 Export CSV
+          </Button>
+        )}
       </div>
 
       {signals.length === 0 ? (
