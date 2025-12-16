@@ -10,13 +10,10 @@ const {
   generateToken,
   getTokenExpiry 
 } = require('../lib/auth');
-const { authRateLimit, isValidEmail } = require('../lib/security');
+const { isValidEmail } = require('../lib/security');
 const { randomBytes } = require('crypto');
 
 const router = express.Router();
-
-// Apply strict rate limiting to auth endpoints
-router.use(authRateLimit);
 
 // Register new host
 router.post('/register', async (req, res) => {
