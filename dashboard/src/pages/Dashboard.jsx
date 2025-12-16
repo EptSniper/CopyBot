@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../lib/api'
-import { Card, CardContent, CardTitle, StatCard, Badge, getPnlColor, SkeletonCard, SkeletonTable, PnLChart, WinLossChart, WinRatePie, SymbolChart } from '../components/ui'
+import { Card, CardContent, CardTitle, StatCard, Badge, getPnlColor, SkeletonCard, SkeletonTable, PnLChart, WinLossChart, WinRatePie, SymbolChart, Onboarding } from '../components/ui'
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null)
@@ -47,6 +47,8 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 animate-fade-in">
+      <Onboarding />
+      
       <div>
         <h1 className="text-3xl font-bold text-white">Dashboard</h1>
         <p className="text-surface-400 mt-1">Overview of your trading signals performance</p>

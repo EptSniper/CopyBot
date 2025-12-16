@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Card, CardContent, CardTitle, StatCard, Badge, Button, getPnlColor, useToast, SkeletonCard, PnLChart, WinRatePie } from '../../components/ui'
+import { Card, CardContent, CardTitle, StatCard, Badge, Button, getPnlColor, useToast, SkeletonCard, PnLChart, WinRatePie, SubscriberOnboarding } from '../../components/ui'
 
 export default function SubscriberDashboard() {
   const [profile, setProfile] = useState(null)
@@ -77,6 +77,8 @@ export default function SubscriberDashboard() {
 
   return (
     <div className="min-h-screen">
+      <SubscriberOnboarding />
+      
       {/* Header */}
       <header className="bg-surface-900/95 backdrop-blur-md border-b border-surface-800 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
