@@ -124,6 +124,7 @@
     - _Requirements: 6.4_
 
 
+
 - [ ] 5. Update Authentication Pages
   - [x] 5.1 Modernize Login page
 
