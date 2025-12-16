@@ -155,9 +155,95 @@ async function sendDailySummaryEmail(subscriber, stats) {
   });
 }
 
+async function sendSignalAlertEmail(subscriber, signal) {
+  const trade = signal.payload || {};
+  return sendEmail({
+    to: subscriber.email,
+    subject: `New Signal: ${trade.side} ${trade.symbol}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #3b82f6;">New Trading Signal</h1>
+        
+        <div style="background: #1f2937; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <table style="width: 100%; color: #e5e7eb;">
+            <tr>
+              <td style="padding: 8px 0; color: #9ca3af;">Symbol:</td>
+              <td style="text-align: right; font-weight: bold;">${trade.symbol}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #9ca3af;">Side:</td>
+              <td style="text-align: right; font-weight: bold; color: ${trade.side === 'BUY' ? '#10b981' : '#ef4444'};">
+                ${trade.side}
+              </td>
+            </tr>
+            ${trade.entryPrice ? `
+            <tr>
+              <td style="padding: 8px 0; color: #9ca3af;">Entry:</td>
+              <td style="text-align: right;">${trade.entryPrice}</td>
+            </tr>` : ''}
+            ${trade.stopLoss ? `
+            <tr>
+              <td style="padding: 8px 0; color: #9ca3af;">Stop Loss:</td>
+              <td style="text-align: right; color: #ef4444;">${trade.stopLoss}</td>
+            </tr>` : ''}
+            ${trade.takeProfits?.[0] ? `
+            <tr>
+              <td style="padding: 8px 0; color: #9ca3af;">Take Profit:</td>
+              <td style="text-align: right; color: #10b981;">${trade.takeProfits[0].price}</td>
+            </tr>` : ''}
+          </table>
+        </div>
+        
+        <p style="color: #6b7280; font-size: 12px;">
+          Signal received at ${new Date().toLocaleString()}
+        </p>
+      </div>
+    `
+  });
+}
+
+async function sendRiskAlertEmail(subscriber, alertType, details) {
+  const titles = {
+    daily_loss: 'Daily Loss Limit Reached',
+    daily_profit: 'Daily Profit Target Reached',
+    trade_limit: 'Daily Trade Limit Reached'
+  };
+  
+  return sendEmail({
+    to: subscriber.email,
+    subject: `⚠️ Risk Alert: ${titles[alertType] || 'Trading Alert'}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #f59e0b;">⚠️ Risk Alert</h1>
+        <h2 style="color: #e5e7eb;">${titles[alertType] || 'Trading Alert'}</h2>
+        
+        <div style="background: #1f2937; padding: 20px; border-radius: 8px; margin: 20px 0; color: #e5e7eb;">
+          <p>${details.message || 'A risk limit has been triggered.'}</p>
+          ${details.current ? `<p>Current: ${details.current}</p>` : ''}
+          ${details.limit ? `<p>Limit: ${details.limit}</p>` : ''}
+        </div>
+        
+        <p style="color: #6b7280; font-size: 14px;">
+          Trading has been ${details.stopped ? 'paused' : 'limited'} based on your preferences.
+          You can adjust your settings in the subscriber portal.
+        </p>
+        
+        <p style="margin-top: 20px;">
+          <a href="${process.env.FRONTEND_URL || 'https://copybot-dashboard.onrender.com'}/subscriber/settings" 
+             style="background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
+            Adjust Settings
+          </a>
+        </p>
+      </div>
+    `
+  });
+}
+
 module.exports = {
   sendEmail,
   sendActivationEmail,
   sendPasswordResetEmail,
-  sendDailySummaryEmail
+  sendDailySummaryEmail,
+  sendSignalAlertEmail,
+  sendRiskAlertEmail
 };

@@ -335,6 +335,61 @@ export default function SubscriberSettings() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Email Notifications */}
+        <Card>
+          <CardContent>
+            <CardTitle className="mb-4">📧 Email Notifications</CardTitle>
+            <p className="text-surface-400 text-sm mb-4">Get notified about your trading activity</p>
+            <div className="space-y-3">
+              <label className="flex items-center gap-3 p-3 rounded-lg bg-surface-800/50 hover:bg-surface-800 transition-colors cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={prefs?.notifications?.daily_summary !== false}
+                  onChange={(e) => setPrefs({
+                    ...prefs,
+                    notifications: { ...prefs.notifications, daily_summary: e.target.checked }
+                  })}
+                  className="w-5 h-5 rounded bg-surface-700 border-surface-600"
+                />
+                <div>
+                  <span className="text-white font-medium">Daily Summary</span>
+                  <p className="text-xs text-surface-500">Receive a daily email with your trading stats</p>
+                </div>
+              </label>
+              <label className="flex items-center gap-3 p-3 rounded-lg bg-surface-800/50 hover:bg-surface-800 transition-colors cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={prefs?.notifications?.signal_alerts || false}
+                  onChange={(e) => setPrefs({
+                    ...prefs,
+                    notifications: { ...prefs.notifications, signal_alerts: e.target.checked }
+                  })}
+                  className="w-5 h-5 rounded bg-surface-700 border-surface-600"
+                />
+                <div>
+                  <span className="text-white font-medium">Signal Alerts</span>
+                  <p className="text-xs text-surface-500">Get notified when new signals are received</p>
+                </div>
+              </label>
+              <label className="flex items-center gap-3 p-3 rounded-lg bg-surface-800/50 hover:bg-surface-800 transition-colors cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={prefs?.notifications?.risk_alerts !== false}
+                  onChange={(e) => setPrefs({
+                    ...prefs,
+                    notifications: { ...prefs.notifications, risk_alerts: e.target.checked }
+                  })}
+                  className="w-5 h-5 rounded bg-surface-700 border-surface-600"
+                />
+                <div>
+                  <span className="text-white font-medium">Risk Alerts</span>
+                  <p className="text-xs text-surface-500">Alert when daily loss/profit limits are reached</p>
+                </div>
+              </label>
+            </div>
+          </CardContent>
+        </Card>
       </main>
     </div>
   )
