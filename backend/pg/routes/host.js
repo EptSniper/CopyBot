@@ -2,6 +2,7 @@ const express = require('express');
 const { query } = require('../db');
 const { randomBytes } = require('crypto');
 const { validateApiKey } = require('../lib/whop');
+const { testWebhook, getWebhookLogs } = require('../lib/webhook');
 
 const router = express.Router();
 
@@ -228,6 +229,41 @@ router.patch('/subscribers/:id', async (req, res) => {
   } catch (err) {
     console.error('Update subscriber error:', err);
     res.status(500).json({ error: 'update failed' });
+  }
+});
+
+// Test subscriber webhook
+router.post('/subscribers/:id/test-webhook', async (req, res) => {
+  try {
+    const host = await one('SELECT * FROM hosts WHERE user_id = $1', [req.user.userId]);
+    const subId = parseInt(req.params.id);
+    
+    const sub = await one('SELECT * FROM subscribers WHERE id = $1 AND host_id = $2', [subId, host.id]);
+    if (!sub) return res.status(404).json({ error: 'subscriber not found' });
+    if (!sub.webhook_url) return res.status(400).json({ error: 'no webhook URL configured' });
+    
+    const result = await testWebhook(sub.webhook_url, sub.webhook_secret);
+    res.json(result);
+  } catch (err) {
+    console.error('Test webhook error:', err);
+    res.status(500).json({ error: 'test failed' });
+  }
+});
+
+// Get subscriber webhook logs
+router.get('/subscribers/:id/webhook-logs', async (req, res) => {
+  try {
+    const host = await one('SELECT * FROM hosts WHERE user_id = $1', [req.user.userId]);
+    const subId = parseInt(req.params.id);
+    
+    const sub = await one('SELECT * FROM subscribers WHERE id = $1 AND host_id = $2', [subId, host.id]);
+    if (!sub) return res.status(404).json({ error: 'subscriber not found' });
+    
+    const logs = await getWebhookLogs(subId, 50);
+    res.json(logs);
+  } catch (err) {
+    console.error('Get webhook logs error:', err);
+    res.status(500).json({ error: 'failed to get logs' });
   }
 });
 

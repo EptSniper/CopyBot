@@ -271,13 +271,7 @@ function extractKey(req) {
 async function all(text, params) { return (await query(text, params)).rows; }
 async function one(text, params) { return (await query(text, params)).rows[0] || null; }
 
-async function sendWebhook(subscriber, payload) {
-  const crypto = require('crypto');
-  const ts = Date.now();
-  const body = JSON.stringify({ trade: payload, timestamp: ts });
-  let sig = '';
-  if (subscriber.webhook_secret) sig = crypto.createHmac('sha256', subscriber.webhook_secret).update(`${ts}.${body}`).digest('hex');
-  await fetch(subscriber.webhook_url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Webhook-Timestamp': ts.toString(), 'X-Webhook-Signature': sig }, body });
-}
+// Use enhanced webhook module with retry logic
+const { sendWebhook } = require('./lib/webhook');
 
 server.listen(PORT, () => console.log(`API server listening on http://localhost:${PORT} (WebSocket on /ws)`));
