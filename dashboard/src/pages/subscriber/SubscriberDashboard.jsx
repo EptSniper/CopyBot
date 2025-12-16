@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Card, CardContent, CardTitle, StatCard, Badge, Button, getPnlColor } from '../../components/ui'
+import { Card, CardContent, CardTitle, StatCard, Badge, Button, getPnlColor, useToast, SkeletonCard } from '../../components/ui'
 
 export default function SubscriberDashboard() {
   const [profile, setProfile] = useState(null)
@@ -41,15 +41,26 @@ export default function SubscriberDashboard() {
     navigate('/subscriber/login')
   }
 
+  const toast = useToast()
+
   const copyApiKey = () => {
     navigator.clipboard.writeText(profile.api_key)
-    alert('API Key copied!')
+    toast.success('API Key copied to clipboard!')
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-surface-400">Loading...</div>
+      <div className="min-h-screen">
+        <header className="bg-surface-900/95 backdrop-blur-md border-b border-surface-800 sticky top-0 z-50">
+          <div className="max-w-6xl mx-auto px-4 py-4">
+            <div className="h-10 w-48 bg-surface-700/50 rounded animate-pulse" />
+          </div>
+        </header>
+        <main className="max-w-6xl mx-auto px-4 py-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {[1,2,3,4].map(i => <SkeletonCard key={i} />)}
+          </div>
+        </main>
       </div>
     )
   }

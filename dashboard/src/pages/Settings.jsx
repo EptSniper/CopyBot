@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAuthStore } from '../store/auth'
 import api from '../lib/api'
-import { Card, CardContent, CardTitle, Button, Input } from '../components/ui'
+import { Card, CardContent, CardTitle, Button, Input, useToast } from '../components/ui'
 
 export default function Settings() {
   const { host, updateHost } = useAuthStore()
@@ -15,7 +15,11 @@ export default function Settings() {
   const [whopProductId, setWhopProductId] = useState(host?.whop_product_id || '')
   const [savingWhop, setSavingWhop] = useState(false)
 
+  const toast = useToast()
+
   const showMessage = (type, text) => {
+    if (type === 'success') toast.success(text)
+    else toast.error(text)
     setMessage({ type, text })
     setTimeout(() => setMessage({ type: '', text: '' }), 3000)
   }

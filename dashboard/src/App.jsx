@@ -21,6 +21,7 @@ import SubscriberDashboard from './pages/subscriber/SubscriberDashboard'
 import SubscriberSettings from './pages/subscriber/SubscriberSettings'
 import SubscriberTrades from './pages/subscriber/SubscriberTrades'
 import Landing from './pages/Landing'
+import NotFound from './pages/NotFound'
 
 function ProtectedRoute({ children }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
@@ -67,6 +68,9 @@ export default function App() {
         <Route path="billing" element={<Billing />} />
         <Route path="invites" element={<Invites />} />
       </Route>
+      
+      {/* 404 */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }

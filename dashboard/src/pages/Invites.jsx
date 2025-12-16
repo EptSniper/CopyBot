@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../lib/api'
-import { Card, CardContent, Button, Input, Badge } from '../components/ui'
+import { Card, CardContent, Button, Input, Badge, useToast, SkeletonCard } from '../components/ui'
 
 export default function Invites() {
   const [invites, setInvites] = useState([])
@@ -65,15 +65,25 @@ export default function Invites() {
     }
   }
 
+  const toast = useToast()
+
   function copyLink(code) {
     navigator.clipboard.writeText(`${dashboardUrl}/join/${code}`)
-    alert('Link copied!')
+    toast.success('Invite link copied!')
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-surface-400">Loading...</div>
+      <div className="space-y-6 animate-fade-in">
+        <div className="flex justify-between items-center">
+          <div>
+            <div className="h-8 w-48 bg-surface-700/50 rounded animate-pulse mb-2" />
+            <div className="h-4 w-64 bg-surface-700/50 rounded animate-pulse" />
+          </div>
+        </div>
+        <div className="space-y-3">
+          {[1,2,3].map(i => <SkeletonCard key={i} />)}
+        </div>
       </div>
     )
   }

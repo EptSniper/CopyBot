@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../lib/api'
-import { Card, CardContent, CardTitle, StatCard, Badge, getPnlColor } from '../components/ui'
+import { Card, CardContent, CardTitle, StatCard, Badge, getPnlColor, SkeletonCard, SkeletonTable } from '../components/ui'
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null)
@@ -29,8 +29,18 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-surface-400">Loading...</div>
+      <div className="space-y-8 animate-fade-in">
+        <div>
+          <div className="h-8 w-48 bg-surface-700/50 rounded animate-pulse mb-2" />
+          <div className="h-4 w-64 bg-surface-700/50 rounded animate-pulse" />
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1,2,3,4].map(i => <SkeletonCard key={i} />)}
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          {[1,2,3,4,5].map(i => <SkeletonCard key={i} />)}
+        </div>
+        <Card><CardContent><SkeletonTable rows={3} cols={6} /></CardContent></Card>
       </div>
     )
   }
