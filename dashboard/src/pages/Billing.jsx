@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '../store/auth'
 import api from '../lib/api'
-import { Card, CardContent, CardTitle, Button, Badge } from '../components/ui'
+import { Card, CardContent, CardTitle, Button, Badge, useToast, SkeletonCard } from '../components/ui'
 
 export default function Billing() {
   const host = useAuthStore((s) => s.host)
@@ -19,12 +19,14 @@ export default function Billing() {
     }).finally(() => setLoading(false))
   }, [])
 
+  const toast = useToast()
+
   const handleUpgrade = async (planName) => {
     try {
       const { checkout_url } = await api.post('/billing/checkout', { plan_name: planName })
       window.location.href = checkout_url
     } catch (err) {
-      alert(err.message)
+      toast.error(err.message)
     }
   }
 
@@ -32,16 +34,24 @@ export default function Billing() {
     if (!confirm('Cancel your subscription? You will be downgraded to the free plan.')) return
     try {
       await api.post('/billing/cancel')
+      toast.success('Subscription cancelled')
       window.location.reload()
     } catch (err) {
-      alert(err.message)
+      toast.error(err.message)
     }
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-surface-400">Loading...</div>
+      <div className="space-y-6 animate-fade-in">
+        <div>
+          <div className="h-8 w-32 bg-surface-700/50 rounded animate-pulse mb-2" />
+          <div className="h-4 w-64 bg-surface-700/50 rounded animate-pulse" />
+        </div>
+        <SkeletonCard />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1,2,3].map(i => <SkeletonCard key={i} />)}
+        </div>
       </div>
     )
   }
