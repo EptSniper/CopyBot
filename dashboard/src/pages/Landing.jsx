@@ -3,7 +3,7 @@ import { Button } from '../components/ui'
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-surface-950">
+    <div className="min-h-screen">
       {/* Header */}
       <header className="border-b border-surface-800/50 backdrop-blur-md bg-surface-950/80 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">

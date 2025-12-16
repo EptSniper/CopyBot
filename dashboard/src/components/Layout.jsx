@@ -23,7 +23,7 @@ export default function Layout() {
   }
 
   return (
-    <div className="h-screen flex overflow-hidden bg-surface-950">
+    <div className="h-screen flex overflow-hidden">
       {/* Mobile menu button */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}

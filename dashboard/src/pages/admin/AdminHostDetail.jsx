@@ -70,7 +70,7 @@ export default function AdminHostDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-surface-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-surface-400">Loading...</div>
       </div>
     )
@@ -78,7 +78,7 @@ export default function AdminHostDetail() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-surface-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-red-400">Host not found</div>
       </div>
     )
@@ -87,7 +87,7 @@ export default function AdminHostDetail() {
   const { host, subscribers, recentSignals, stats } = data
 
   return (
-    <div className="min-h-screen bg-surface-950 text-white">
+    <div className="min-h-screen text-white">
       <header className="bg-surface-900/95 backdrop-blur-md border-b border-surface-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
