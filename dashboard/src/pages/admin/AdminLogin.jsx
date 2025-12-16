@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Card, CardContent, Button, Input } from '../../components/ui'
 
 export default function AdminLogin() {
   const [token, setToken] = useState('')
@@ -17,33 +18,49 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="bg-gray-800 p-8 rounded-lg max-w-md w-full">
-        <h1 className="text-2xl font-bold text-white mb-6">Admin Access</h1>
-        
-        {error && (
-          <div className="bg-red-900/50 text-red-200 p-3 rounded mb-4">{error}</div>
-        )}
+    <div className="min-h-screen bg-surface-950 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background effects */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-red-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl" />
+      </div>
+      
+      <Card className="max-w-md w-full relative z-10 animate-fade-in" hover={false}>
+        <CardContent className="p-8">
+          <div className="flex justify-center mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-2xl shadow-lg shadow-red-500/20">
+                🔐
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-white to-surface-300 bg-clip-text text-transparent">
+                Admin
+              </span>
+            </div>
+          </div>
+          
+          <h1 className="text-2xl font-bold text-white mb-2 text-center">Admin Access</h1>
+          <p className="text-surface-400 text-center mb-8">Enter your admin token to continue</p>
+          
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg mb-6 text-sm">
+              {error}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-gray-300 mb-1">Admin Token</label>
-            <input
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <Input
+              label="Admin Token"
               type="password"
               value={token}
               onChange={e => setToken(e.target.value)}
-              className="w-full bg-gray-700 text-white p-3 rounded focus:ring-2 focus:ring-blue-500 outline-none"
               placeholder="Enter admin token"
             />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded font-semibold"
-          >
-            Login
-          </button>
-        </form>
-      </div>
+            <Button type="submit" className="w-full">
+              Login
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }

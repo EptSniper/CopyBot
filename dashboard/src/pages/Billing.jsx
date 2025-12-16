@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '../store/auth'
 import api from '../lib/api'
+import { Card, CardContent, CardTitle, Button, Badge } from '../components/ui'
 
 export default function Billing() {
   const host = useAuthStore((s) => s.host)
@@ -37,95 +38,120 @@ export default function Billing() {
     }
   }
 
-  if (loading) return <div className="text-center py-8 text-gray-400">Loading...</div>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-surface-400">Loading...</div>
+      </div>
+    )
+  }
 
   const currentPlan = plans.find(p => p.name === host?.plan) || plans[0]
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">Billing</h1>
-
-      {/* Current plan */}
-      <div className="bg-gray-800 rounded-lg p-6 mb-6">
-        <h2 className="text-lg font-semibold mb-4">Current Plan</h2>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-2xl font-bold capitalize">{host?.plan || 'Free'}</p>
-            <p className="text-gray-400">
-              {currentPlan?.subscriber_limit} subscribers included
-            </p>
-          </div>
-          {host?.plan !== 'free' && (
-            <button
-              onClick={handleCancel}
-              className="text-red-400 hover:text-red-300"
-            >
-              Cancel Subscription
-            </button>
-          )}
-        </div>
+    <div className="space-y-6 animate-fade-in">
+      <div>
+        <h1 className="text-3xl font-bold text-white">Billing</h1>
+        <p className="text-surface-400 mt-1">Manage your subscription and billing</p>
       </div>
 
-      {/* Plans */}
-      <h2 className="text-lg font-semibold mb-4">Available Plans</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {plans.map((plan) => (
-          <div
-            key={plan.id}
-            className={`bg-gray-800 rounded-lg p-6 ${plan.name === host?.plan ? 'ring-2 ring-blue-500' : ''}`}
-          >
-            <h3 className="text-xl font-bold capitalize mb-2">{plan.name}</h3>
-            <p className="text-3xl font-bold mb-4">
-              ${(plan.price_cents / 100).toFixed(0)}
-              <span className="text-sm text-gray-400 font-normal">/month</span>
-            </p>
-            <ul className="text-sm text-gray-300 mb-6 space-y-2">
-              <li>✓ {plan.subscriber_limit} subscribers</li>
-              {plan.features?.map((f, i) => (
-                <li key={i}>✓ {f.replace(/_/g, ' ')}</li>
-              ))}
-            </ul>
-            {plan.name === host?.plan ? (
-              <button disabled className="w-full py-2 bg-gray-700 text-gray-400 rounded">
-                Current Plan
-              </button>
-            ) : plan.price_cents > (currentPlan?.price_cents || 0) ? (
+      {/* Current plan */}
+      <Card>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-surface-400 text-sm mb-1">Current Plan</p>
+              <div className="flex items-center gap-3">
+                <p className="text-2xl font-bold text-white capitalize">{host?.plan || 'Free'}</p>
+                <Badge variant={
+                  host?.plan === 'enterprise' ? 'purple' :
+                  host?.plan === 'pro' ? 'primary' : 'neutral'
+                }>
+                  {currentPlan?.subscriber_limit} subscribers
+                </Badge>
+              </div>
+            </div>
+            {host?.plan !== 'free' && (
               <button
-                onClick={() => handleUpgrade(plan.name)}
-                className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                onClick={handleCancel}
+                className="text-red-400 hover:text-red-300 text-sm transition-colors"
               >
-                Upgrade
-              </button>
-            ) : (
-              <button disabled className="w-full py-2 bg-gray-700 text-gray-400 rounded">
-                Downgrade via Cancel
+                Cancel Subscription
               </button>
             )}
           </div>
-        ))}
+        </CardContent>
+      </Card>
+
+      {/* Plans */}
+      <div>
+        <h2 className="text-xl font-semibold text-white mb-4">Available Plans</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {plans.map((plan) => (
+            <Card
+              key={plan.id}
+              className={plan.name === host?.plan ? 'ring-2 ring-primary-500' : ''}
+            >
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold capitalize text-white mb-2">{plan.name}</h3>
+                <p className="text-3xl font-bold text-white mb-4">
+                  ${(plan.price_cents / 100).toFixed(0)}
+                  <span className="text-sm text-surface-400 font-normal">/month</span>
+                </p>
+                <ul className="text-sm text-surface-300 mb-6 space-y-2">
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-400">✓</span>
+                    {plan.subscriber_limit} subscribers
+                  </li>
+                  {plan.features?.map((f, i) => (
+                    <li key={i} className="flex items-center gap-2">
+                      <span className="text-emerald-400">✓</span>
+                      {f.replace(/_/g, ' ')}
+                    </li>
+                  ))}
+                </ul>
+                {plan.name === host?.plan ? (
+                  <Button variant="secondary" disabled className="w-full">
+                    Current Plan
+                  </Button>
+                ) : plan.price_cents > (currentPlan?.price_cents || 0) ? (
+                  <Button onClick={() => handleUpgrade(plan.name)} className="w-full">
+                    Upgrade
+                  </Button>
+                ) : (
+                  <Button variant="secondary" disabled className="w-full">
+                    Downgrade via Cancel
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
 
       {/* Billing history */}
       {billing?.billingEvents?.length > 0 && (
-        <div className="bg-gray-800 rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Billing History</h2>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-700">
-                <th className="text-left py-2 text-gray-400">Event</th>
-                <th className="text-left py-2 text-gray-400">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {billing.billingEvents.map((event) => (
-                <tr key={event.id} className="border-b border-gray-700">
-                  <td className="py-2">{event.event_type.replace(/_/g, ' ')}</td>
-                  <td className="py-2 text-gray-400">{new Date(event.created_at).toLocaleString()}</td>
+        <Card>
+          <CardContent>
+            <CardTitle className="mb-4">Billing History</CardTitle>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-surface-700/50">
+                  <th className="text-left py-2 text-surface-400 font-medium">Event</th>
+                  <th className="text-left py-2 text-surface-400 font-medium">Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {billing.billingEvents.map((event) => (
+                  <tr key={event.id} className="border-b border-surface-700/30">
+                    <td className="py-3 text-white">{event.event_type.replace(/_/g, ' ')}</td>
+                    <td className="py-3 text-surface-400">{new Date(event.created_at).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </CardContent>
+        </Card>
       )}
     </div>
   )

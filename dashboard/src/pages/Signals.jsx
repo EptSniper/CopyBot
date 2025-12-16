@@ -155,3 +155,68 @@ export default function Signals() {
           </div>
         </>
       )}
+
+
+      {/* Result Edit Modal */}
+      {editingSignal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+          <Card className="w-full max-w-md mx-4" hover={false}>
+            <CardContent className="p-6">
+              <h2 className="text-xl font-bold mb-2 text-white">Log Trade Result</h2>
+              <p className="text-surface-400 mb-6">
+                Signal #{editingSignal.id}: {editingSignal.payload?.symbol} {editingSignal.payload?.side}
+              </p>
+              
+              <div className="space-y-4">
+                <Select
+                  label="Result"
+                  value={resultForm.result}
+                  onChange={(e) => setResultForm({ ...resultForm, result: e.target.value })}
+                >
+                  <option value="">Select result...</option>
+                  <option value="win">Win</option>
+                  <option value="loss">Loss</option>
+                  <option value="breakeven">Breakeven</option>
+                </Select>
+                
+                <Input
+                  label="Exit Price"
+                  type="number"
+                  step="0.01"
+                  value={resultForm.exit_price}
+                  onChange={(e) => setResultForm({ ...resultForm, exit_price: e.target.value })}
+                  placeholder="5010.50"
+                />
+                
+                <Input
+                  label="P&L ($)"
+                  type="number"
+                  step="0.01"
+                  value={resultForm.pnl}
+                  onChange={(e) => setResultForm({ ...resultForm, pnl: e.target.value })}
+                  placeholder="150.00 or -50.00"
+                />
+              </div>
+              
+              <div className="flex gap-3 mt-6">
+                <Button
+                  variant="secondary"
+                  onClick={() => setEditingSignal(null)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => handleUpdateResult(editingSignal.id)}
+                  className="flex-1"
+                >
+                  Save Result
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </div>
+  )
+}

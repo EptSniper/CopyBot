@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { Card, CardContent, CardTitle, StatCard, Badge, Button, getPnlColor } from '../../components/ui'
 
 export default function SubscriberDashboard() {
   const [profile, setProfile] = useState(null)
@@ -47,8 +48,8 @@ export default function SubscriberDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen bg-surface-950 flex items-center justify-center">
+        <div className="text-surface-400">Loading...</div>
       </div>
     )
   }
@@ -59,111 +60,105 @@ export default function SubscriberDashboard() {
     : 0
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-surface-950">
       {/* Header */}
-      <header className="bg-gray-800 border-b border-gray-700">
+      <header className="bg-surface-900/95 backdrop-blur-md border-b border-surface-800 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-xl font-bold text-white">Subscriber Portal</h1>
-            <p className="text-sm text-gray-400">{profile?.host_name}</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xl shadow-lg shadow-purple-500/20">
+              👤
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-white">Subscriber Portal</h1>
+              <p className="text-sm text-surface-400">{profile?.host_name}</p>
+            </div>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-gray-300">{profile?.name}</span>
-            <button
-              onClick={handleLogout}
-              className="px-3 py-1 bg-gray-700 text-gray-300 rounded hover:bg-gray-600"
-            >
+            <span className="text-surface-300 hidden sm:block">{profile?.name}</span>
+            <Button variant="secondary" size="sm" onClick={handleLogout}>
               Logout
-            </button>
+            </Button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gray-800 rounded-lg p-4">
-            <p className="text-gray-400 text-sm">Total Signals</p>
-            <p className="text-2xl font-bold text-white">{stats.total_signals || 0}</p>
-          </div>
-          <div className="bg-gray-800 rounded-lg p-4">
-            <p className="text-gray-400 text-sm">Executed</p>
-            <p className="text-2xl font-bold text-green-400">{stats.executed || 0}</p>
-          </div>
-          <div className="bg-gray-800 rounded-lg p-4">
-            <p className="text-gray-400 text-sm">Win Rate</p>
-            <p className="text-2xl font-bold text-blue-400">{winRate}%</p>
-          </div>
-          <div className="bg-gray-800 rounded-lg p-4">
-            <p className="text-gray-400 text-sm">Total P&L</p>
-            <p className={`text-2xl font-bold ${parseFloat(stats.total_pnl) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              ${parseFloat(stats.total_pnl || 0).toFixed(2)}
-            </p>
-          </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <StatCard label="Total Signals" value={stats.total_signals || 0} icon="📡" />
+          <StatCard label="Executed" value={stats.executed || 0} color="green" icon="✓" />
+          <StatCard label="Win Rate" value={`${winRate}%`} color="blue" icon="📊" />
+          <StatCard 
+            label="Total P&L" 
+            value={`$${parseFloat(stats.total_pnl || 0).toFixed(2)}`}
+            color={getPnlColor(stats.total_pnl)}
+            icon="💰"
+          />
         </div>
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           {/* API Key */}
-          <div className="bg-gray-800 rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Your API Key</h2>
-            <div className="flex items-center gap-2">
-              <code className="flex-1 bg-gray-900 p-3 rounded text-green-400 text-sm break-all">
-                {profile?.api_key}
-              </code>
-              <button
-                onClick={copyApiKey}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Copy
-              </button>
-            </div>
-            <p className="text-xs text-gray-500 mt-2">Use this in NinjaTrader CopyBot settings</p>
-          </div>
+          <Card>
+            <CardContent>
+              <CardTitle className="mb-4">Your API Key</CardTitle>
+              <div className="flex items-center gap-2">
+                <code className="flex-1 bg-surface-900 p-3 rounded-lg text-emerald-400 text-sm break-all border border-surface-700/50">
+                  {profile?.api_key}
+                </code>
+                <Button onClick={copyApiKey}>Copy</Button>
+              </div>
+              <p className="text-xs text-surface-500 mt-2">Use this in NinjaTrader CopyBot settings</p>
+            </CardContent>
+          </Card>
 
           {/* Status */}
-          <div className="bg-gray-800 rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Subscription Status</h2>
-            <div className="flex items-center gap-3 mb-4">
-              <span className={`px-3 py-1 rounded text-sm ${
-                profile?.status === 'active' ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'
-              }`}>
-                {profile?.status}
-              </span>
-              <span className="text-gray-400">
-                Today's trades: {profile?.daily_trade_count || 0}
-                {profile?.preferences?.max_trades_per_day > 0 && ` / ${profile.preferences.max_trades_per_day}`}
-              </span>
-            </div>
-            <Link
-              to="/subscriber/settings"
-              className="inline-block px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-            >
-              Configure Trading Preferences
-            </Link>
-          </div>
+          <Card>
+            <CardContent>
+              <CardTitle className="mb-4">Subscription Status</CardTitle>
+              <div className="flex items-center gap-3 mb-4">
+                <Badge variant={profile?.status === 'active' ? 'success' : 'danger'} size="lg">
+                  {profile?.status}
+                </Badge>
+                <span className="text-surface-400">
+                  Today's trades: {profile?.daily_trade_count || 0}
+                  {profile?.preferences?.max_trades_per_day > 0 && ` / ${profile.preferences.max_trades_per_day}`}
+                </span>
+              </div>
+              <Link to="/subscriber/settings">
+                <Button variant="secondary">Configure Trading Preferences</Button>
+              </Link>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Navigation */}
         <div className="grid md:grid-cols-3 gap-4">
-          <Link
-            to="/subscriber/settings"
-            className="bg-gray-800 rounded-lg p-6 hover:bg-gray-750 transition"
-          >
-            <h3 className="text-lg font-semibold text-white mb-2">⚙️ Settings</h3>
-            <p className="text-gray-400 text-sm">Configure sessions, risk limits, and trading hours</p>
+          <Link to="/subscriber/settings">
+            <Card className="h-full">
+              <CardContent>
+                <div className="text-3xl mb-3">⚙️</div>
+                <h3 className="text-lg font-semibold text-white mb-2">Settings</h3>
+                <p className="text-surface-400 text-sm">Configure sessions, risk limits, and trading hours</p>
+              </CardContent>
+            </Card>
           </Link>
-          <Link
-            to="/subscriber/trades"
-            className="bg-gray-800 rounded-lg p-6 hover:bg-gray-750 transition"
-          >
-            <h3 className="text-lg font-semibold text-white mb-2">📊 Trade History</h3>
-            <p className="text-gray-400 text-sm">View all your past signals and executions</p>
+          <Link to="/subscriber/trades">
+            <Card className="h-full">
+              <CardContent>
+                <div className="text-3xl mb-3">📊</div>
+                <h3 className="text-lg font-semibold text-white mb-2">Trade History</h3>
+                <p className="text-surface-400 text-sm">View all your past signals and executions</p>
+              </CardContent>
+            </Card>
           </Link>
-          <div className="bg-gray-800 rounded-lg p-6 opacity-60">
-            <h3 className="text-lg font-semibold text-white mb-2">📈 Analytics</h3>
-            <p className="text-gray-400 text-sm">Coming soon...</p>
-          </div>
+          <Card className="h-full opacity-60" hover={false}>
+            <CardContent>
+              <div className="text-3xl mb-3">📈</div>
+              <h3 className="text-lg font-semibold text-white mb-2">Analytics</h3>
+              <p className="text-surface-400 text-sm">Coming soon...</p>
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>

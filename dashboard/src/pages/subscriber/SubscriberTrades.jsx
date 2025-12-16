@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { Card, CardContent, Button, Badge } from '../../components/ui'
 
 export default function SubscriberTrades() {
   const [trades, setTrades] = useState([])
@@ -35,132 +36,135 @@ export default function SubscriberTrades() {
     }
   }
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleString()
-  }
+  const formatDate = (date) => new Date(date).toLocaleString()
 
-  const getStatusColor = (status) => {
+  const getStatusVariant = (status) => {
     switch (status) {
-      case 'executed': return 'bg-green-900 text-green-300'
-      case 'pending': return 'bg-yellow-900 text-yellow-300'
-      case 'delivered': return 'bg-blue-900 text-blue-300'
-      case 'skipped': return 'bg-gray-700 text-gray-400'
-      case 'failed': return 'bg-red-900 text-red-300'
-      default: return 'bg-gray-700 text-gray-400'
-    }
-  }
-
-  const getResultColor = (result) => {
-    switch (result) {
-      case 'win': return 'text-green-400'
-      case 'loss': return 'text-red-400'
-      case 'breakeven': return 'text-gray-400'
-      default: return 'text-gray-500'
+      case 'executed': return 'success'
+      case 'pending': return 'warning'
+      case 'delivered': return 'info'
+      case 'skipped': return 'neutral'
+      case 'failed': return 'danger'
+      default: return 'neutral'
     }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen bg-surface-950 flex items-center justify-center">
+        <div className="text-surface-400">Loading...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-surface-950">
       {/* Header */}
-      <header className="bg-gray-800 border-b border-gray-700">
+      <header className="bg-surface-900/95 backdrop-blur-md border-b border-surface-800 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <Link to="/subscriber/dashboard" className="text-gray-400 hover:text-white">
+            <Link to="/subscriber/dashboard" className="text-surface-400 hover:text-white transition-colors">
               ← Back
             </Link>
             <h1 className="text-xl font-bold text-white">Trade History</h1>
           </div>
-          <span className="text-gray-400">{pagination.total} total trades</span>
+          <span className="text-surface-400">{pagination.total} total trades</span>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
         {trades.length === 0 ? (
-          <div className="bg-gray-800 rounded-lg p-8 text-center">
-            <p className="text-gray-400">No trades yet</p>
-            <p className="text-sm text-gray-500 mt-2">Signals will appear here once you start receiving them</p>
-          </div>
+          <Card>
+            <CardContent className="py-12 text-center">
+              <div className="text-4xl mb-4">📊</div>
+              <p className="text-surface-300 mb-2">No trades yet</p>
+              <p className="text-sm text-surface-500">Signals will appear here once you start receiving them</p>
+            </CardContent>
+          </Card>
         ) : (
           <>
-            <div className="bg-gray-800 rounded-lg overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-gray-900">
-                  <tr>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Time</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Symbol</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Side</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Status</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Result</th>
-                    <th className="text-right px-4 py-3 text-sm font-medium text-gray-400">P&L</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {trades.map((trade) => (
-                    <tr key={trade.id} className="border-t border-gray-700">
-                      <td className="px-4 py-3 text-sm text-gray-300">
-                        {formatDate(trade.signal_time)}
-                      </td>
-                      <td className="px-4 py-3 font-medium text-white">
-                        {trade.signal?.symbol || '-'}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={trade.signal?.side === 'buy' ? 'text-green-400' : 'text-red-400'}>
-                          {trade.signal?.side?.toUpperCase() || '-'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded text-xs ${getStatusColor(trade.status)}`}>
-                          {trade.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={getResultColor(trade.result)}>
-                          {trade.result || '-'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        {trade.pnl !== null ? (
-                          <span className={trade.pnl >= 0 ? 'text-green-400' : 'text-red-400'}>
-                            ${parseFloat(trade.pnl).toFixed(2)}
-                          </span>
-                        ) : (
-                          <span className="text-gray-500">-</span>
-                        )}
-                      </td>
+            <Card hover={false}>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-surface-900/50">
+                    <tr>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-surface-400">Time</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-surface-400">Symbol</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-surface-400">Side</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-surface-400">Status</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-surface-400">Result</th>
+                      <th className="text-right px-4 py-3 text-sm font-medium text-surface-400">P&L</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {trades.map((trade) => (
+                      <tr key={trade.id} className="border-t border-surface-700/30 hover:bg-surface-800/30 transition-colors">
+                        <td className="px-4 py-3 text-sm text-surface-300">
+                          {formatDate(trade.signal_time)}
+                        </td>
+                        <td className="px-4 py-3 font-medium text-white">
+                          {trade.signal?.symbol || '-'}
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge variant={trade.signal?.side === 'buy' ? 'success' : 'danger'}>
+                            {trade.signal?.side?.toUpperCase() || '-'}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge variant={getStatusVariant(trade.status)}>
+                            {trade.status}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3">
+                          {trade.result ? (
+                            <Badge variant={
+                              trade.result === 'win' ? 'success' :
+                              trade.result === 'loss' ? 'danger' : 'neutral'
+                            }>
+                              {trade.result}
+                            </Badge>
+                          ) : (
+                            <span className="text-surface-500">-</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          {trade.pnl !== null ? (
+                            <span className={trade.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+                              ${parseFloat(trade.pnl).toFixed(2)}
+                            </span>
+                          ) : (
+                            <span className="text-surface-500">-</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
 
             {/* Pagination */}
             {pagination.total > pagination.limit && (
-              <div className="flex justify-center gap-2 mt-6">
-                <button
+              <div className="flex justify-center items-center gap-4 mt-6">
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={() => setPagination({ ...pagination, offset: Math.max(0, pagination.offset - pagination.limit) })}
                   disabled={pagination.offset === 0}
-                  className="px-4 py-2 bg-gray-800 text-white rounded disabled:opacity-50"
                 >
                   Previous
-                </button>
-                <span className="px-4 py-2 text-gray-400">
+                </Button>
+                <span className="text-surface-400">
                   Page {Math.floor(pagination.offset / pagination.limit) + 1} of {Math.ceil(pagination.total / pagination.limit)}
                 </span>
-                <button
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={() => setPagination({ ...pagination, offset: pagination.offset + pagination.limit })}
                   disabled={pagination.offset + pagination.limit >= pagination.total}
-                  className="px-4 py-2 bg-gray-800 text-white rounded disabled:opacity-50"
                 >
                   Next
-                </button>
+                </Button>
               </div>
             )}
           </>

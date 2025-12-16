@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../lib/api'
+import { Card, CardContent, Button, Input, Badge } from '../components/ui'
 
 export default function Subscribers() {
   const [subscribers, setSubscribers] = useState([])
@@ -51,131 +52,143 @@ export default function Subscribers() {
     loadSubscribers()
   }
 
-  if (loading) return <div className="text-center py-8 text-gray-400">Loading...</div>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-surface-400">Loading...</div>
+      </div>
+    )
+  }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Subscribers</h1>
-        <button
-          onClick={() => { setEditingSub(null); setForm({ name: '', email: '', webhook_url: '' }); setShowModal(true) }}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Subscribers</h1>
+          <p className="text-surface-400 mt-1">Manage your signal subscribers</p>
+        </div>
+        <Button onClick={() => { setEditingSub(null); setForm({ name: '', email: '', webhook_url: '' }); setShowModal(true) }}>
           Add Subscriber
-        </button>
+        </Button>
       </div>
 
       {subscribers.length === 0 ? (
-        <div className="bg-gray-800 rounded-lg p-8 text-center">
-          <p className="text-gray-400 mb-4">No subscribers yet</p>
-          <p className="text-sm text-gray-500">Add your first subscriber to start distributing signals</p>
-        </div>
+        <Card>
+          <CardContent className="py-12 text-center">
+            <div className="text-4xl mb-4">👥</div>
+            <p className="text-surface-300 mb-2">No subscribers yet</p>
+            <p className="text-sm text-surface-500">Add your first subscriber to start distributing signals</p>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="bg-gray-800 rounded-lg overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-900">
-              <tr>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Name</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Email</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Source</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Status</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">API Key</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Deliveries</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-400">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {subscribers.map((sub) => (
-                <tr key={sub.id} className="border-t border-gray-700">
-                  <td className="px-4 py-3 font-medium">{sub.name}</td>
-                  <td className="px-4 py-3 text-gray-400">{sub.email || '-'}</td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      sub.activated_via === 'whop' ? 'bg-purple-900 text-purple-300' :
-                      sub.activated_via === 'invite' ? 'bg-blue-900 text-blue-300' :
-                      'bg-gray-700 text-gray-400'
-                    }`}>
-                      {sub.activated_via || 'manual'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded text-xs ${sub.status === 'active' ? 'bg-green-900 text-green-300' : 'bg-gray-700 text-gray-400'}`}>
-                      {sub.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <code 
-                      className="text-xs bg-gray-900 text-blue-400 px-2 py-1 rounded cursor-pointer hover:bg-gray-700"
-                      onClick={() => { navigator.clipboard.writeText(sub.api_key); alert('API Key copied!'); }}
-                      title="Click to copy full key"
-                    >
-                      {sub.api_key?.slice(0, 20)}... 📋
-                    </code>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-400">
-                    {sub.executed_deliveries || 0} / {sub.total_deliveries || 0}
-                  </td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => handleEdit(sub)} className="text-blue-400 hover:text-blue-300 text-sm mr-3">Edit</button>
-                    <button onClick={() => toggleStatus(sub)} className="text-yellow-400 hover:text-yellow-300 text-sm mr-3">
-                      {sub.status === 'active' ? 'Disable' : 'Enable'}
-                    </button>
-                    <button onClick={() => handleDelete(sub.id)} className="text-red-400 hover:text-red-300 text-sm">Delete</button>
-                  </td>
+        <Card hover={false}>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-surface-900/50">
+                <tr>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-surface-400">Name</th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-surface-400">Email</th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-surface-400">Source</th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-surface-400">Status</th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-surface-400">API Key</th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-surface-400">Deliveries</th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-surface-400">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {subscribers.map((sub) => (
+                  <tr key={sub.id} className="border-t border-surface-700/30 hover:bg-surface-800/30 transition-colors">
+                    <td className="px-4 py-3 font-medium text-white">{sub.name}</td>
+                    <td className="px-4 py-3 text-surface-400">{sub.email || '-'}</td>
+                    <td className="px-4 py-3">
+                      <Badge variant={
+                        sub.activated_via === 'whop' ? 'purple' :
+                        sub.activated_via === 'invite' ? 'info' : 'neutral'
+                      }>
+                        {sub.activated_via || 'manual'}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Badge variant={sub.status === 'active' ? 'success' : 'neutral'}>
+                        {sub.status}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3">
+                      <code 
+                        className="text-xs bg-surface-900 text-primary-400 px-2 py-1 rounded cursor-pointer hover:bg-surface-800 transition-colors"
+                        onClick={() => { navigator.clipboard.writeText(sub.api_key); alert('API Key copied!'); }}
+                        title="Click to copy full key"
+                      >
+                        {sub.api_key?.slice(0, 20)}... 📋
+                      </code>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-surface-400">
+                      <span className="text-emerald-400">{sub.executed_deliveries || 0}</span>
+                      <span className="text-surface-500"> / {sub.total_deliveries || 0}</span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-2">
+                        <button onClick={() => handleEdit(sub)} className="text-primary-400 hover:text-primary-300 text-sm transition-colors">Edit</button>
+                        <button onClick={() => toggleStatus(sub)} className="text-amber-400 hover:text-amber-300 text-sm transition-colors">
+                          {sub.status === 'active' ? 'Disable' : 'Enable'}
+                        </button>
+                        <button onClick={() => handleDelete(sub.id)} className="text-red-400 hover:text-red-300 text-sm transition-colors">Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">{editingSub ? 'Edit Subscriber' : 'Add Subscriber'}</h2>
-            {error && <div className="bg-red-900/50 text-red-200 p-3 rounded mb-4">{error}</div>}
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-300 mb-1">Name</label>
-                <input
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+          <Card className="w-full max-w-md mx-4" hover={false}>
+            <CardContent className="p-6">
+              <h2 className="text-xl font-bold mb-6 text-white">{editingSub ? 'Edit Subscriber' : 'Add Subscriber'}</h2>
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg mb-6 text-sm">
+                  {error}
+                </div>
+              )}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <Input
+                  label="Name"
                   type="text"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:ring-2 focus:ring-blue-500 outline-none"
                   required
                 />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-300 mb-1">Email (optional)</label>
-                <input
+                <Input
+                  label="Email (optional)"
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:ring-2 focus:ring-blue-500 outline-none"
                 />
-              </div>
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-300 mb-1">Webhook URL (optional)</label>
-                <input
-                  type="url"
-                  value={form.webhook_url}
-                  onChange={(e) => setForm({ ...form, webhook_url: e.target.value })}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                />
-                <p className="text-xs text-gray-500 mt-1">Signals will be POSTed to this URL</p>
-              </div>
-              <div className="flex gap-3">
-                <button type="button" onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 bg-gray-700 rounded hover:bg-gray-600">
-                  Cancel
-                </button>
-                <button type="submit" className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                  {editingSub ? 'Save' : 'Create'}
-                </button>
-              </div>
-            </form>
-          </div>
+                <div>
+                  <Input
+                    label="Webhook URL (optional)"
+                    type="url"
+                    value={form.webhook_url}
+                    onChange={(e) => setForm({ ...form, webhook_url: e.target.value })}
+                    placeholder="https://..."
+                  />
+                  <p className="text-xs text-surface-500 mt-1">Signals will be POSTed to this URL</p>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <Button type="button" variant="secondary" onClick={() => setShowModal(false)} className="flex-1">
+                    Cancel
+                  </Button>
+                  <Button type="submit" className="flex-1">
+                    {editingSub ? 'Save' : 'Create'}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>

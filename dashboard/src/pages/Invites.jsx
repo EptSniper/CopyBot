@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../lib/api'
+import { Card, CardContent, Button, Input, Badge } from '../components/ui'
 
 export default function Invites() {
   const [invites, setInvites] = useState([])
@@ -69,124 +70,116 @@ export default function Invites() {
     alert('Link copied!')
   }
 
-  if (loading) return <div className="text-gray-400">Loading...</div>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-surface-400">Loading...</div>
+      </div>
+    )
+  }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Invite Links</h1>
-        <button
-          onClick={() => setShowCreate(!showCreate)}
-          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
-        >
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Invite Links</h1>
+          <p className="text-surface-400 mt-1">Create and manage subscriber invite links</p>
+        </div>
+        <Button onClick={() => setShowCreate(!showCreate)}>
           + Create Invite
-        </button>
+        </Button>
       </div>
 
       {error && (
-        <div className="bg-red-900/50 text-red-200 p-3 rounded mb-4">{error}</div>
+        <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-sm">
+          {error}
+        </div>
       )}
 
       {showCreate && (
-        <form onSubmit={createInvite} className="bg-gray-800 p-4 rounded-lg mb-6 space-y-4">
-          <div>
-            <label className="block text-gray-400 text-sm mb-1">Label (optional)</label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={e => setForm({ ...form, name: e.target.value })}
-              className="w-full bg-gray-700 p-2 rounded"
-              placeholder="e.g., Discord Promo"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-400 text-sm mb-1">Max Uses (blank = unlimited)</label>
-              <input
-                type="number"
-                value={form.maxUses}
-                onChange={e => setForm({ ...form, maxUses: e.target.value })}
-                className="w-full bg-gray-700 p-2 rounded"
-                placeholder="100"
+        <Card>
+          <CardContent>
+            <form onSubmit={createInvite} className="space-y-4">
+              <Input
+                label="Label (optional)"
+                type="text"
+                value={form.name}
+                onChange={e => setForm({ ...form, name: e.target.value })}
+                placeholder="e.g., Discord Promo"
               />
-            </div>
-            <div>
-              <label className="block text-gray-400 text-sm mb-1">Expires in Days (blank = never)</label>
-              <input
-                type="number"
-                value={form.expiresInDays}
-                onChange={e => setForm({ ...form, expiresInDays: e.target.value })}
-                className="w-full bg-gray-700 p-2 rounded"
-                placeholder="30"
-              />
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={creating}
-              className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded"
-            >
-              {creating ? 'Creating...' : 'Create'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowCreate(false)}
-              className="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Max Uses (blank = unlimited)"
+                  type="number"
+                  value={form.maxUses}
+                  onChange={e => setForm({ ...form, maxUses: e.target.value })}
+                  placeholder="100"
+                />
+                <Input
+                  label="Expires in Days (blank = never)"
+                  type="number"
+                  value={form.expiresInDays}
+                  onChange={e => setForm({ ...form, expiresInDays: e.target.value })}
+                  placeholder="30"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button type="submit" variant="success" loading={creating}>
+                  Create
+                </Button>
+                <Button type="button" variant="secondary" onClick={() => setShowCreate(false)}>
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       )}
 
       <div className="space-y-3">
         {invites.length === 0 ? (
-          <div className="text-gray-500 text-center py-8">
-            No invite links yet. Create one to let subscribers join!
-          </div>
+          <Card>
+            <CardContent className="py-12 text-center">
+              <div className="text-4xl mb-4">🔗</div>
+              <p className="text-surface-300 mb-2">No invite links yet</p>
+              <p className="text-sm text-surface-500">Create one to let subscribers join!</p>
+            </CardContent>
+          </Card>
         ) : (
           invites.map(invite => (
-            <div key={invite.id} className="bg-gray-800 p-4 rounded-lg">
-              <div className="flex justify-between items-start">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-blue-400">{invite.code}</span>
-                    {invite.name && (
-                      <span className="text-gray-400">({invite.name})</span>
-                    )}
-                    {!invite.active && (
-                      <span className="bg-red-900 text-red-300 text-xs px-2 py-0.5 rounded">Disabled</span>
-                    )}
+            <Card key={invite.id}>
+              <CardContent className="py-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-primary-400">{invite.code}</span>
+                      {invite.name && (
+                        <span className="text-surface-400">({invite.name})</span>
+                      )}
+                      {!invite.active && (
+                        <Badge variant="danger" size="sm">Disabled</Badge>
+                      )}
+                    </div>
+                    <div className="text-sm text-surface-500 mt-1">
+                      {invite.uses} uses
+                      {invite.max_uses && ` / ${invite.max_uses} max`}
+                      {invite.expires_at && ` • Expires ${new Date(invite.expires_at).toLocaleDateString()}`}
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-500 mt-1">
-                    {invite.uses} uses
-                    {invite.max_uses && ` / ${invite.max_uses} max`}
-                    {invite.expires_at && ` • Expires ${new Date(invite.expires_at).toLocaleDateString()}`}
+                  <div className="flex gap-2">
+                    <Button size="sm" onClick={() => copyLink(invite.code)}>
+                      Copy Link
+                    </Button>
+                    <Button size="sm" variant="secondary" onClick={() => toggleInvite(invite.id, invite.active)}>
+                      {invite.active ? 'Disable' : 'Enable'}
+                    </Button>
+                    <Button size="sm" variant="danger" onClick={() => deleteInvite(invite.id)}>
+                      Delete
+                    </Button>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => copyLink(invite.code)}
-                    className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm"
-                  >
-                    Copy Link
-                  </button>
-                  <button
-                    onClick={() => toggleInvite(invite.id, invite.active)}
-                    className="bg-gray-600 hover:bg-gray-700 px-3 py-1 rounded text-sm"
-                  >
-                    {invite.active ? 'Disable' : 'Enable'}
-                  </button>
-                  <button
-                    onClick={() => deleteInvite(invite.id)}
-                    className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           ))
         )}
       </div>
