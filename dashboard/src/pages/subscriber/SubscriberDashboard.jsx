@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Card, CardContent, CardTitle, StatCard, Badge, Button, getPnlColor, useToast, SkeletonCard } from '../../components/ui'
+import { Card, CardContent, CardTitle, StatCard, Badge, Button, getPnlColor, useToast, SkeletonCard, PnLChart, WinRatePie } from '../../components/ui'
 
 export default function SubscriberDashboard() {
   const [profile, setProfile] = useState(null)
+  const [analytics, setAnalytics] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const navigate = useNavigate()
@@ -21,12 +22,16 @@ export default function SubscriberDashboard() {
 
   const loadProfile = async () => {
     try {
-      const res = await fetch(`${API_URL}/subscriber/me`, {
-        headers: { 'x-api-key': apiKey }
-      })
-      if (!res.ok) throw new Error('Session expired')
-      const data = await res.json()
+      const [profileRes, analyticsRes] = await Promise.all([
+        fetch(`${API_URL}/subscriber/me`, { headers: { 'x-api-key': apiKey } }),
+        fetch(`${API_URL}/subscriber/analytics?days=30`, { headers: { 'x-api-key': apiKey } })
+      ])
+      if (!profileRes.ok) throw new Error('Session expired')
+      const data = await profileRes.json()
       setProfile(data)
+      if (analyticsRes.ok) {
+        setAnalytics(await analyticsRes.json())
+      }
     } catch (err) {
       setError(err.message)
       localStorage.removeItem('subscriber_api_key')
@@ -143,6 +148,35 @@ export default function SubscriberDashboard() {
           </Card>
         </div>
 
+        {/* Performance Charts */}
+        {analytics && (
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            <Card>
+              <CardContent>
+                <CardTitle className="mb-4">P&L Over Time (30 days)</CardTitle>
+                <PnLChart 
+                  data={analytics.daily?.slice().reverse().map(d => ({
+                    date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                    pnl: parseFloat(d.pnl || 0)
+                  })) || []} 
+                />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent>
+                <CardTitle className="mb-4">Win/Loss Distribution</CardTitle>
+                <div className="flex items-center justify-center">
+                  <WinRatePie 
+                    wins={parseInt(analytics.overall?.wins) || 0}
+                    losses={parseInt(analytics.overall?.losses) || 0}
+                    pending={parseInt(analytics.overall?.pending) || 0}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Navigation */}
         <div className="grid md:grid-cols-3 gap-4">
           <Link to="/subscriber/settings">
@@ -163,13 +197,15 @@ export default function SubscriberDashboard() {
               </CardContent>
             </Card>
           </Link>
-          <Card className="h-full opacity-60" hover={false}>
-            <CardContent>
-              <div className="text-3xl mb-3">📈</div>
-              <h3 className="text-lg font-semibold text-white mb-2">Analytics</h3>
-              <p className="text-surface-400 text-sm">Coming soon...</p>
-            </CardContent>
-          </Card>
+          <Link to="/subscriber/trades">
+            <Card className="h-full">
+              <CardContent>
+                <div className="text-3xl mb-3">📈</div>
+                <h3 className="text-lg font-semibold text-white mb-2">Analytics</h3>
+                <p className="text-surface-400 text-sm">View detailed performance analytics</p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </main>
     </div>

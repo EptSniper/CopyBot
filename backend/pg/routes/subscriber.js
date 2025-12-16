@@ -94,6 +94,69 @@ router.post('/reset-daily', subAuth, async (req, res) => {
   res.json({ ok: true });
 });
 
+// Get subscriber analytics
+router.get('/analytics', subAuth, async (req, res) => {
+  const days = parseInt(req.query.days) || 30;
+
+  // Overall stats
+  const overall = await one(`
+    SELECT
+      COUNT(*) as total_trades,
+      COUNT(*) FILTER (WHERE d.result = 'win') as wins,
+      COUNT(*) FILTER (WHERE d.result = 'loss') as losses,
+      COUNT(*) FILTER (WHERE d.result = 'breakeven') as breakeven,
+      COUNT(*) FILTER (WHERE d.result IS NULL OR d.result = 'pending') as pending,
+      COALESCE(SUM(d.pnl), 0) as total_pnl,
+      COALESCE(AVG(d.pnl) FILTER (WHERE d.result IS NOT NULL), 0) as avg_pnl,
+      COALESCE(AVG(d.pnl_percent) FILTER (WHERE d.result IS NOT NULL), 0) as avg_pnl_percent
+    FROM deliveries d
+    JOIN signals s ON s.id = d.signal_id
+    WHERE d.subscriber_id = $1 AND s.created_at > NOW() - INTERVAL '1 day' * $2
+  `, [req.subscriber.id, days]);
+
+  // Daily breakdown
+  const daily = await all(`
+    SELECT 
+      DATE(s.created_at) as date,
+      COUNT(*) as trades,
+      COUNT(*) FILTER (WHERE d.result = 'win') as wins,
+      COUNT(*) FILTER (WHERE d.result = 'loss') as losses,
+      COALESCE(SUM(d.pnl), 0) as pnl
+    FROM deliveries d
+    JOIN signals s ON s.id = d.signal_id
+    WHERE d.subscriber_id = $1 AND s.created_at > NOW() - INTERVAL '1 day' * $2
+    GROUP BY DATE(s.created_at)
+    ORDER BY date DESC
+  `, [req.subscriber.id, days]);
+
+  // By symbol
+  const bySymbol = await all(`
+    SELECT 
+      s.payload->>'symbol' as symbol,
+      COUNT(*) as trades,
+      COUNT(*) FILTER (WHERE d.result = 'win') as wins,
+      COUNT(*) FILTER (WHERE d.result = 'loss') as losses,
+      COALESCE(SUM(d.pnl), 0) as pnl
+    FROM deliveries d
+    JOIN signals s ON s.id = d.signal_id
+    WHERE d.subscriber_id = $1 AND s.created_at > NOW() - INTERVAL '1 day' * $2
+    GROUP BY s.payload->>'symbol'
+    ORDER BY trades DESC
+    LIMIT 10
+  `, [req.subscriber.id, days]);
+
+  // Win rate calculation
+  const closedTrades = (parseInt(overall.wins) || 0) + (parseInt(overall.losses) || 0);
+  const winRate = closedTrades > 0 ? ((parseInt(overall.wins) || 0) / closedTrades * 100).toFixed(1) : 0;
+
+  res.json({
+    period: `${days} days`,
+    overall: { ...overall, win_rate: winRate },
+    daily,
+    bySymbol
+  });
+});
+
 // Helper functions
 function getDefaultPreferences() {
   return {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../lib/api'
-import { Card, CardContent, CardTitle, StatCard, Badge, getPnlColor, SkeletonCard, SkeletonTable } from '../components/ui'
+import { Card, CardContent, CardTitle, StatCard, Badge, getPnlColor, SkeletonCard, SkeletonTable, PnLChart, WinLossChart, WinRatePie, SymbolChart } from '../components/ui'
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null)
@@ -108,6 +108,51 @@ export default function Dashboard() {
               value={`${parseFloat(analytics.overall.avg_pnl_percent || 0).toFixed(2)}%`}
               color={getPnlColor(analytics.overall.avg_pnl_percent)}
             />
+          </div>
+
+          {/* Performance Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardContent>
+                <CardTitle className="mb-4">P&L Over Time</CardTitle>
+                <PnLChart 
+                  data={analytics.daily?.slice().reverse().map(d => ({
+                    date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                    pnl: parseFloat(d.pnl || 0)
+                  })) || []} 
+                />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent>
+                <CardTitle className="mb-4">Win/Loss Distribution</CardTitle>
+                <div className="flex items-center justify-center">
+                  <WinRatePie 
+                    wins={parseInt(analytics.overall.wins) || 0}
+                    losses={parseInt(analytics.overall.losses) || 0}
+                    pending={parseInt(analytics.overall.pending) || 0}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent>
+                <CardTitle className="mb-4">Daily Wins vs Losses</CardTitle>
+                <WinLossChart 
+                  data={analytics.daily?.slice().reverse().map(d => ({
+                    date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                    wins: parseInt(d.wins) || 0,
+                    losses: parseInt(d.losses) || 0
+                  })) || []} 
+                />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent>
+                <CardTitle className="mb-4">P&L by Symbol</CardTitle>
+                <SymbolChart data={analytics.bySymbol || []} />
+              </CardContent>
+            </Card>
           </div>
 
           {/* Performance by Symbol */}
