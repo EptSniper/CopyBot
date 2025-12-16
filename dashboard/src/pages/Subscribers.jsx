@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../lib/api'
-import { Card, CardContent, Button, Input, Badge } from '../components/ui'
+import { Card, CardContent, Button, Input, Badge, useToast, SkeletonTable } from '../components/ui'
 
 export default function Subscribers() {
   const [subscribers, setSubscribers] = useState([])
@@ -52,10 +52,23 @@ export default function Subscribers() {
     loadSubscribers()
   }
 
+  const toast = useToast()
+
+  const copyApiKey = (key) => {
+    navigator.clipboard.writeText(key)
+    toast.success('API Key copied!')
+  }
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-surface-400">Loading...</div>
+      <div className="space-y-6 animate-fade-in">
+        <div className="flex justify-between items-center">
+          <div>
+            <div className="h-8 w-48 bg-surface-700/50 rounded animate-pulse mb-2" />
+            <div className="h-4 w-64 bg-surface-700/50 rounded animate-pulse" />
+          </div>
+        </div>
+        <Card><CardContent><SkeletonTable rows={5} cols={7} /></CardContent></Card>
       </div>
     )
   }
@@ -116,7 +129,7 @@ export default function Subscribers() {
                     <td className="px-4 py-3">
                       <code 
                         className="text-xs bg-surface-900 text-primary-400 px-2 py-1 rounded cursor-pointer hover:bg-surface-800 transition-colors"
-                        onClick={() => { navigator.clipboard.writeText(sub.api_key); alert('API Key copied!'); }}
+                        onClick={() => copyApiKey(sub.api_key)}
                         title="Click to copy full key"
                       >
                         {sub.api_key?.slice(0, 20)}... 📋

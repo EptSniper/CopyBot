@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Card, CardContent, CardTitle, Button, Input, Select } from '../../components/ui'
+import { Card, CardContent, CardTitle, Button, Input, Select, useToast, SkeletonCard } from '../../components/ui'
 
 export default function SubscriberSettings() {
   const [profile, setProfile] = useState(null)
@@ -48,6 +48,8 @@ export default function SubscriberSettings() {
     auto_execute: true
   })
 
+  const toast = useToast()
+
   const handleSave = async () => {
     setSaving(true)
     setMessage({ type: '', text: '' })
@@ -61,8 +63,10 @@ export default function SubscriberSettings() {
         const data = await res.json()
         throw new Error(data.error || 'Save failed')
       }
+      toast.success('Settings saved!')
       setMessage({ type: 'success', text: 'Settings saved!' })
     } catch (err) {
+      toast.error(err.message)
       setMessage({ type: 'error', text: err.message })
     } finally {
       setSaving(false)
@@ -80,8 +84,15 @@ export default function SubscriberSettings() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-surface-400">Loading...</div>
+      <div className="min-h-screen">
+        <header className="bg-surface-900/95 backdrop-blur-md border-b border-surface-800 sticky top-0 z-50">
+          <div className="max-w-4xl mx-auto px-4 py-4">
+            <div className="h-8 w-48 bg-surface-700/50 rounded animate-pulse" />
+          </div>
+        </header>
+        <main className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+          {[1,2,3,4].map(i => <SkeletonCard key={i} />)}
+        </main>
       </div>
     )
   }
